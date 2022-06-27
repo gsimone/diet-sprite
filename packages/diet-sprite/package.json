@@ -1,0 +1,19 @@
+{
+  "name": "diet-sprite",
+  "version": "0.0.1",
+  "main": "dist/diet-sprite.cjs.js",
+  "module": "dist/diet-sprite.esm.js",
+  "license": "MIT",
+  "peerDependencies": {
+    "three": "^0.139.2"
+  },
+  "preconstruct": {
+    "entrypoints": [
+      "index.ts"
+    ]
+  },
+  "dependencies": {
+    "earcut": "^2.2.3",
+    "maath": "^0.0.2"
+  }
+}

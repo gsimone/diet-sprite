@@ -1,0 +1,47 @@
+{
+  "name": "diet-sprite",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*",
+    "demo"
+  ],
+  "preconstruct": {
+    "packages": [
+      "packages/*"
+    ]
+  },
+  "scripts": {
+    "ci": "preconstruct validate && manypkg check && pnpm build",
+    "release": "pnpm ci && changeset publish --access public",
+    "postinstall": "preconstruct dev",
+    "build": "preconstruct build",
+    "dev": "preconstruct dev",
+    "demo": "cd demo && pnpm dev",
+    "test": "jest",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@babel/preset-typescript": "^7.16.7",
+    "@changesets/cli": "^2.22.0",
+    "@manypkg/cli": "^0.19.1",
+    "@preconstruct/cli": "^2.1.5",
+    "@types/jest": "^27.4.1",
+    "@types/three": "^0.139.0",
+    "babel-jest": "^27.5.1",
+    "husky": ">=6",
+    "jest": "^27.5.1",
+    "leva": "^0.9.23",
+    "lint-staged": ">=10",
+    "prettier": "^2.6.2",
+    "typescript": "^4.6.3"
+  },
+  "lint-staged": {
+    "packages/**/src/*.{ts,tsx,css,md}": "prettier --write"
+  }
+}

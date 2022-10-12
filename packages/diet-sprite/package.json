@@ -9,7 +9,8 @@
   },
   "preconstruct": {
     "entrypoints": [
-      "index.ts"
+      "index.ts",
+      "filters.ts"
     ]
   },
   "dependencies": {

@@ -6,29 +6,6 @@ import { materialKey } from "../materials";
 import { useFrame } from "@react-three/fiber";
 import { Texture } from "three";
 
-export function useClippedFlipbook(
-  image: HTMLImageElement | Texture,
-  vertices: number,
-  horizontalSlices: number,
-  verticalSlices: number,
-  alphaThreshold: number
-) {
-  return useMemo(() => {
-    return createClippedFlipbook(
-      image,
-      vertices,
-      alphaThreshold,
-      horizontalSlices,
-      verticalSlices,
-    );
-  }, [image, vertices, horizontalSlices, verticalSlices, alphaThreshold]);
-}
-
-// format number to 2 decimal places
-function format(number: number) {
-  return Math.round(number * 100) / 100;
-}
-
 type MyFlipbookProps = {
   map: Texture;
   fps: number;
@@ -36,7 +13,7 @@ type MyFlipbookProps = {
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
-  alphaThreshold: number;
+  threshold: number;
 };
 
 export function MyFlipbook({
@@ -46,20 +23,25 @@ export function MyFlipbook({
   vertices,
   horizontalSlices,
   verticalSlices,
-  alphaThreshold,
+  threshold,
   ...props
 }: MyFlipbookProps) {
   const $mat = useRef();
   const $mat2 = useRef();
 
-  const [geometry, dataTexture, _, savings] = useClippedFlipbook(
-    map.image,
-    vertices,
-    horizontalSlices,
-    verticalSlices,
-    alphaThreshold
-  );
+  const [geometry, dataTexture, _, savings] = useMemo(() => {
+    return createClippedFlipbook(
+      map.image,
+      vertices,
+      threshold,
+      horizontalSlices,
+      verticalSlices
+    );
+  }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
+  /**
+   * Animates the u_index uniform to go through the flipbook
+   */
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if ($mat.current && $mat2.current) {
@@ -93,10 +75,9 @@ export function MyFlipbook({
           ref={$mat}
           u_data={dataTexture}
           u_debugUv={1}
-          u_horizontalSlices={horizontalSlices}
           u_map={map}
+          u_slices={[horizontalSlices, verticalSlices]}
           u_vertices={vertices}
-          u_verticalSlices={verticalSlices}
           wireframe
         />
       </mesh>
@@ -107,10 +88,9 @@ export function MyFlipbook({
           ref={$mat2}
           transparent
           u_data={dataTexture}
-          u_horizontalSlices={horizontalSlices}
           u_map={map}
+          u_slices={[horizontalSlices, verticalSlices]}
           u_vertices={vertices}
-          u_verticalSlices={verticalSlices}
         />
       </mesh>
       <Text
@@ -120,8 +100,17 @@ export function MyFlipbook({
         anchorX="right"
         anchorY="top"
       >
-        avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% - max {format(savings.max * 100)}%
+        avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% -
+        max {format(savings.max * 100)}%
       </Text>
     </group>
   );
+}
+
+/**
+ * You can ignore this
+ */
+// format number to 2 decimal places
+function format(number: number) {
+  return Math.round(number * 100) / 100;
 }

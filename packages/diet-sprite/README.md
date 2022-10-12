@@ -40,4 +40,5 @@ const [geometry, dataTexture] = createFlipbookGeometry(
 
 #### Settings 
 
-  * `alphaThreshold`: similar to what you would use to render a sprite, it's the alpha value below which a point is not considered as part of the sprite.
+  * `filter`: a function that, given a `threshold` and an RGB value, returns a boolean based on wether the value is over the threshold.
+  * `threshold`: similar to what you would use to render a sprite, it's a value below which a point is not considered as part of the sprite.

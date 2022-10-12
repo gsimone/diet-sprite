@@ -20,7 +20,7 @@ The geometry can be easily generated at runtime from an image:
 ```jsx
 // vanilla example
 const geometry = new ClippedSpriteGeometry(
-  image, // an already loaded HTMLImageElement, for example from a Texture
+  image, // an already loaded HTMLImageElement or a ThreeJS texture
   8, // the number of desired vertices. 4/6/8 seem to give good results most of the time.
   0 // alphaThreshold, 0 means only fully transparent pixels will be discarded
 )
@@ -48,10 +48,10 @@ const myTexture = useTexture('myImage.png') // a r3f texture
 
 ```js
 const [geometry, dataTexture, api] = createFlipbookGeometry(
-  image, // an already loaded HTMLImageElement
+  image, // an already loaded HTMLImageElement or a ThreeJS texture
   vertices, // the number of desired vertices. 4/6/8 seem to give good results most of the time.
-  horizontalSlices, // the number of horizontal slices
-  verticalSlices, // the number of vertical slices
+  horizontalSlices, // the number of horizontal slices in the flipbook
+  verticalSlices, // the number of vertical slices in the flipbook
   settings // optional settings, see below
 )
 ```

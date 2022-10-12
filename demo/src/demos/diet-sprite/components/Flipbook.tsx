@@ -6,29 +6,6 @@ import { materialKey } from "../materials";
 import { useFrame } from "@react-three/fiber";
 import { Texture } from "three";
 
-export function useClippedFlipbook(
-  image: HTMLImageElement | Texture,
-  vertices: number,
-  horizontalSlices: number,
-  verticalSlices: number,
-  threshold: number
-) {
-  return useMemo(() => {
-    return createClippedFlipbook(
-      image,
-      vertices,
-      threshold,
-      horizontalSlices,
-      verticalSlices
-    );
-  }, [image, vertices, horizontalSlices, verticalSlices, threshold]);
-}
-
-// format number to 2 decimal places
-function format(number: number) {
-  return Math.round(number * 100) / 100;
-}
-
 type MyFlipbookProps = {
   map: Texture;
   fps: number;
@@ -52,14 +29,19 @@ export function MyFlipbook({
   const $mat = useRef();
   const $mat2 = useRef();
 
-  const [geometry, dataTexture, _, savings] = useClippedFlipbook(
-    map.image,
-    vertices,
-    horizontalSlices,
-    verticalSlices,
-    threshold
-  );
+  const [geometry, dataTexture, _, savings] = useMemo(() => {
+    return createClippedFlipbook(
+      map.image,
+      vertices,
+      threshold,
+      horizontalSlices,
+      verticalSlices
+    );
+  }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
+  /**
+   * Animates the u_index uniform to go through the flipbook
+   */
   useFrame(({ clock }) => {
     const t = clock.getElapsedTime();
     if ($mat.current && $mat2.current) {
@@ -125,4 +107,12 @@ export function MyFlipbook({
       </Text>
     </group>
   );
+}
+
+/**
+ * You can ignore this
+ */
+// format number to 2 decimal places
+function format(number: number) {
+  return Math.round(number * 100) / 100;
 }

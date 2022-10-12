@@ -3,6 +3,15 @@ import { extend } from "@react-three/fiber";
 
 export const materialKey = (() => Math.random())();
 
+const billboardChunk = /* glsl */ `
+  vec3 billboard(vec2 v, mat4 view){
+    vec3 up = vec3(view[0][1], view[1][1], view[2][1]);
+    vec3 right = vec3(view[0][0], view[1][0], view[2][0]);
+    vec3 p = right * v.x + up * v.y;
+    return p;
+  }
+`;
+
 const MyMaterial = shaderMaterial(
   {
     u_data: null,
@@ -22,6 +31,7 @@ const MyMaterial = shaderMaterial(
   uniform float u_verticalSlices;
   uniform float u_vertices;
   
+  // returns the relative UVs in the flipbook given absolute UVs and flipbook data 
   vec2 flipbookUv( vec2 uv, float horizontalSlices, float verticalSlices, float index ) {
     float horizontalIndex = mod(index, horizontalSlices);
     float verticalIndex = floor(index / horizontalSlices);
@@ -35,23 +45,19 @@ const MyMaterial = shaderMaterial(
     return vec2(u, v);
   }
 
-  vec3 getPositionFromDataTexture( sampler2D data, int vertexID, float numberOfVertices, float horizontalSlices, float verticalSlices, float index) {
+  vec3 getPositionFromDataTexture( sampler2D dataTexture, int vertexID, float numberOfVertices, float horizontalSlices, float verticalSlices, float index) {
     float u = float( vertexID ) / numberOfVertices;
     float total = horizontalSlices * verticalSlices;
     float v  = ( 1. / total ) * index;
-    vec3 pos = texture2D( data, vec2( u, v ) ).rgb;
+    vec3 pos = texture2D( dataTexture, vec2( u, v ) ).rgb;
 
     return pos;
   }
 
-  vec3 billboard(vec2 v, mat4 view){
-    vec3 up = vec3(view[0][1], view[1][1], view[2][1]);
-    vec3 right = vec3(view[0][0], view[1][0], view[2][0]);
-    vec3 p = right * v.x + up * v.y;
-    return p;
-  }
+  ${billboardChunk}
   
   void main () {
+    // the index is offset by gl_instanceID to give it some pizzaz
     float offsetIndex = u_index - mod(float(gl_InstanceID), u_horizontalSlices * u_verticalSlices);
 
     vec3 pos = getPositionFromDataTexture( u_data, gl_VertexID, u_vertices, u_horizontalSlices, u_verticalSlices, offsetIndex );
@@ -102,6 +108,9 @@ const MyUVsMaterial = shaderMaterial(
 `
 );
 
+/*
+ * Simple Billboard material
+ **/
 const MyBillboardMaterial = shaderMaterial(
   {
     map: null,
@@ -109,12 +118,7 @@ const MyBillboardMaterial = shaderMaterial(
   /* glsl */ `
   varying vec2 vUv; 
 
-  vec3 billboard(vec2 v, mat4 view){
-    vec3 up = vec3(view[0][1], view[1][1], view[2][1]);
-    vec3 right = vec3(view[0][0], view[1][0], view[2][0]);
-    vec3 p = right * v.x + up * v.y;
-    return p;
-  }
+  ${billboardChunk}
 
   void main () {
     vUv = uv;

@@ -4,14 +4,13 @@ import {
   DataTexture,
   FloatType,
   RGBAFormat,
-  RGBFormat,
   Texture,
 } from "three";
-import { PolygonGenerator, Settings } from "./PolygonGenerator";
+import { PolygonGenerator } from "./PolygonGenerator";
 import { addAxis, fillBuffer } from "./utils";
 
 const DEFAULT_SETTINGS = {
-  alphaThreshold: 0.01,
+  threshold: 0.01,
   horizontalSlices: 1,
   verticalSlices: 1,
   horizontalIndex: 0,
@@ -26,7 +25,7 @@ export class ClippedSpriteGeometry extends BufferGeometry {
   constructor(
     imageOrTexture: HTMLImageElement | Texture,
     vertices = 8,
-    alphaThreshold = 0.01,
+    threshold = 0.01,
     horizontalSlices = 1,
     verticalSlices = 1,
     horizontalIndex = 0,
@@ -37,16 +36,16 @@ export class ClippedSpriteGeometry extends BufferGeometry {
     this.vertices = vertices;
     this.settings = {
       ...this.settings,
-      alphaThreshold,
+      threshold,
       horizontalSlices,
       verticalSlices,
       horizontalIndex,
       verticalIndex,
     };
+
     this.image =
       "image" in imageOrTexture ? imageOrTexture.image : imageOrTexture;
 
-    console.log(this.settings);
     this.build();
   }
 
@@ -71,55 +70,6 @@ export class ClippedSpriteGeometry extends BufferGeometry {
     this.setAttribute("normal", normalBA);
     this.setAttribute("uv", uvBA);
   }
-
-  // set alphaThreshold(value: number) {
-  //   this.settings.alphaThreshold = value;
-  //   this.build()
-  // }
-
-  // get alphaThreshold(): number {
-  //   return this.settings.alphaThreshold;
-  // }
-
-  // set vertices(value: number) {
-  //   this.vertices = value;
-  // }
-
-  // get vertices(): number {
-  //   return this.vertices;
-  // }
-
-  // set horizontalSlices(value: number) {
-  //   this.settings.horizontalSlices = value;
-  // }
-
-  // get horizontalSlices(): number {
-  //   return this.settings.horizontalSlices;
-  // }
-
-  // set verticalSlices(value: number) {
-  //   this.settings.verticalSlices = value;
-  // }
-
-  // get verticalSlices(): number {
-  //   return this.settings.verticalSlices;
-  // }
-
-  // set horizontalIndex(value: number) {
-  //   this.settings.horizontalIndex = value;
-  // }
-
-  // get horizontalIndex(): number {
-  //   return this.settings.horizontalIndex;
-  // }
-
-  // set verticalIndex(value: number) {
-  //   this.settings.verticalIndex = value;
-  // }
-
-  // get verticalIndex(): number {
-  //   return this.settings.verticalIndex;
-  // }
 }
 
 export class ClippedFlipbookGeometry extends BufferGeometry {
@@ -142,7 +92,7 @@ export class ClippedFlipbookGeometry extends BufferGeometry {
 export function createClippedFlipbook(
   imageOrTexture: HTMLImageElement | Texture,
   vertices: number,
-  alphaThreshold: number,
+  threshold: number,
   horizontalSlices: number,
   verticalSlices: number
 ): [
@@ -168,7 +118,7 @@ export function createClippedFlipbook(
     const geometry = new ClippedSpriteGeometry(
       imageOrTexture,
       vertices,
-      alphaThreshold,
+      threshold,
       horizontalSlices,
       verticalSlices,
       i % horizontalSlices,

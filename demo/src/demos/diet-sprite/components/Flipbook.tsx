@@ -11,17 +11,17 @@ export function useClippedFlipbook(
   vertices: number,
   horizontalSlices: number,
   verticalSlices: number,
-  alphaThreshold: number
+  threshold: number
 ) {
   return useMemo(() => {
     return createClippedFlipbook(
       image,
       vertices,
-      alphaThreshold,
+      threshold,
       horizontalSlices,
-      verticalSlices,
+      verticalSlices
     );
-  }, [image, vertices, horizontalSlices, verticalSlices, alphaThreshold]);
+  }, [image, vertices, horizontalSlices, verticalSlices, threshold]);
 }
 
 // format number to 2 decimal places
@@ -36,7 +36,7 @@ type MyFlipbookProps = {
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
-  alphaThreshold: number;
+  threshold: number;
 };
 
 export function MyFlipbook({
@@ -46,7 +46,7 @@ export function MyFlipbook({
   vertices,
   horizontalSlices,
   verticalSlices,
-  alphaThreshold,
+  threshold,
   ...props
 }: MyFlipbookProps) {
   const $mat = useRef();
@@ -57,7 +57,7 @@ export function MyFlipbook({
     vertices,
     horizontalSlices,
     verticalSlices,
-    alphaThreshold
+    threshold
   );
 
   useFrame(({ clock }) => {
@@ -120,7 +120,8 @@ export function MyFlipbook({
         anchorX="right"
         anchorY="top"
       >
-        avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% - max {format(savings.max * 100)}%
+        avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% -
+        max {format(savings.max * 100)}%
       </Text>
     </group>
   );

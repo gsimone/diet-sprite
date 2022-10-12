@@ -1,12 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
 import { useFrame } from "@react-three/fiber";
-import {
-  InstancedMesh,
-  NormalBlending,
-  Object3D,
-  Texture
-} from "three";
+import { InstancedMesh, NormalBlending, Object3D, Texture } from "three";
 
 import * as random from "maath/random";
 
@@ -20,11 +15,11 @@ type Props = {
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
-  alphaThreshold: number;
+  threshold: number;
 };
 
 export function MyInstances(props: Props) {
-  const { map, fps, vertices, horizontalSlices, verticalSlices, alphaThreshold } =
+  const { map, fps, vertices, horizontalSlices, verticalSlices, threshold } =
     props;
 
   const [geometry, dataTexture] = useClippedFlipbook(
@@ -32,7 +27,7 @@ export function MyInstances(props: Props) {
     vertices,
     horizontalSlices,
     verticalSlices,
-    alphaThreshold
+    threshold
   );
 
   const $mat = useRef();

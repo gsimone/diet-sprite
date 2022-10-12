@@ -3,11 +3,16 @@ import { folder, useControls } from "leva";
 import { useLayoutEffect, useRef, useState } from "react";
 import { BufferGeometry } from "three";
 
-export function MySprite({ map, index, vertices, showPolygon, 
-  alphaThreshold,
+export function MySprite({
+  map,
+  index,
+  vertices,
+  showPolygon,
+  threshold,
   horizontalSlices,
   verticalSlices,
-  ...props }) {
+  ...props
+}) {
   const ref = useRef<BufferGeometry>(null!);
   const [reduction, setReduction] = useState(0);
 
@@ -21,7 +26,7 @@ export function MySprite({ map, index, vertices, showPolygon,
     index,
     vertices,
     setReduction,
-    alphaThreshold,
+    threshold,
     horizontalIndex,
     verticalIndex,
   ]);
@@ -40,7 +45,7 @@ export function MySprite({ map, index, vertices, showPolygon,
           args={[
             map,
             vertices,
-            alphaThreshold,
+            threshold,
             horizontalSlices,
             verticalSlices,
             horizontalIndex,
@@ -50,7 +55,7 @@ export function MySprite({ map, index, vertices, showPolygon,
         <myBillboardMaterial
           map={map}
           transparent
-          alphaTest={alphaThreshold}
+          alphaTest={threshold}
           alphaMap={map}
         />
       </mesh>
@@ -60,7 +65,7 @@ export function MySprite({ map, index, vertices, showPolygon,
           args={[
             map,
             vertices,
-            alphaThreshold,
+            threshold,
             horizontalSlices,
             verticalSlices,
             horizontalIndex,

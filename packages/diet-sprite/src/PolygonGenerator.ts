@@ -7,6 +7,7 @@ import { convexhull, simplifyConvexHull, calcPolygonArea } from "./geometry";
 import { Point } from ".";
 import { addAxis, createBufferFromListOfPoints, getNeighbours } from "./utils";
 import * as debug from "./debug";
+import { checkPointAlpha } from "./filters";
 
 const createCanvas = (id = "debug-canvas", width: number, height: number) => {
   const canvas =
@@ -42,19 +43,23 @@ const normalizePositions = (
 };
 
 export type Settings = {
-  alphaThreshold?: number;
-  horizontalSlices?: number;
-  verticalSlices?: number;
-  horizontalIndex?: number;
-  verticalIndex?: number;
+  scale: number;
+  threshold: number;
+  horizontalSlices: number;
+  verticalSlices: number;
+  horizontalIndex: number;
+  verticalIndex: number;
+  filter: (threshold: number) => (...rgb: number[]) => boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
-  alphaThreshold: 0.01,
+  threshold: 0.01,
   horizontalSlices: 1,
   verticalSlices: 1,
   horizontalIndex: 0,
   verticalIndex: 0,
+  scale: 1,
+  filter: checkPointAlpha,
 };
 
 export class PolygonGenerator {
@@ -74,7 +79,7 @@ export class PolygonGenerator {
 
   defaultSettings = DEFAULT_SETTINGS;
 
-  settings: typeof this.defaultSettings;
+  settings: Settings;
 
   constructor(
     img: HTMLImageElement,
@@ -170,41 +175,23 @@ export class PolygonGenerator {
 
     const points = [];
 
-    /**
-     * @TODO find a better API for this. The user should be able to either choose a test or pass one.
-     * These should also all implement a common interface
-     */
-    const checkPointAlpha = (...rgba: number[]) => {
-      return rgba[3] / 255 > 0;
-    };
-
-    const checkPointLuminance = (...rgba: number[]) => {
-      const [R, G, B] = rgba;
-
-      return (
-        0.2126 * (R / 255) + 0.7152 * (G / 255) + 0.0722 * (B / 255) >
-        this.settings.alphaThreshold
-      );
-    };
-
-    const checkPointValue = (...rgba: number[]) => {
-      const [R, G, B] = rgba;
-
-      return (R + G + B) / (255 * 3) > this.settings.alphaThreshold;
-    };
+    const filterFn = this.settings.filter(this.settings.threshold);
 
     const checkNeighbours =
-      (checkFn: (...channels: number[]) => boolean) => (n: number | null) =>
+      (filterFn: (...channels: number[]) => boolean) => (n: number | null) =>
         n !== null &&
-        checkFn(data[n * 4], data[n * 4 + 1], data[n * 4 + 2], data[n * 4 + 3]);
-
-    const checkFn = checkPointLuminance;
+        filterFn(
+          data[n * 4],
+          data[n * 4 + 1],
+          data[n * 4 + 2],
+          data[n * 4 + 3]
+        );
 
     for (let i = 0; i < data.length; i += 4) {
-      if (checkFn(data[i + 0], data[i + 1], data[i + 2], data[i + 3])) {
+      if (filterFn(data[i + 0], data[i + 1], data[i + 2], data[i + 3])) {
         const neighbours = getNeighbours(i, canvas.width, canvas.height);
         // if neighbour are all opaque, never add point
-        if (neighbours.every(checkNeighbours(checkFn))) {
+        if (neighbours.every(checkNeighbours(filterFn))) {
           continue;
         }
 

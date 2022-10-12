@@ -30,13 +30,10 @@ export function MyFlipbook({
   const $mat2 = useRef();
 
   const [geometry, dataTexture, _, savings] = useMemo(() => {
-    return createClippedFlipbook(
-      map.image,
-      vertices,
-      threshold,
+    return createClippedFlipbook(map.image, vertices, threshold, [
       horizontalSlices,
-      verticalSlices
-    );
+      verticalSlices,
+    ]);
   }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
   /**

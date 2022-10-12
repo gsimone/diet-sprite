@@ -23,13 +23,10 @@ export function MyInstances(props: Props) {
     props;
 
   const [geometry, dataTexture] = useMemo(() => {
-    return createClippedFlipbook(
-      map.image,
-      vertices,
-      threshold,
+    return createClippedFlipbook(map.image, vertices, threshold, [
       horizontalSlices,
-      verticalSlices
-    );
+      verticalSlices,
+    ]);
   }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
   const $mat = useRef();

@@ -11,19 +11,15 @@ import { checkPointAlpha } from "./filters";
 export type Settings = {
   scale: number;
   threshold: number;
-  horizontalSlices: number;
-  verticalSlices: number;
-  horizontalIndex: number;
-  verticalIndex: number;
+  slices: [number, number];
+  indices: [number, number];
   filter: (threshold: number) => (...rgb: number[]) => boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
   threshold: 0.01,
-  horizontalSlices: 1,
-  verticalSlices: 1,
-  horizontalIndex: 0,
-  verticalIndex: 0,
+  slices: [1, 1],
+  indices: [0, 0],
   scale: 1,
   filter: checkPointAlpha,
 };
@@ -54,10 +50,7 @@ export class PolygonGenerator {
   ) {
     this.settings = { ...this.defaultSettings, ...settings };
 
-    const slices: [number, number] = [
-      this.settings.horizontalSlices,
-      this.settings.verticalSlices,
-    ];
+    const { slices } = this.settings;
 
     const canvas = createCanvas("bvc-image", img.width, img.height);
     this.points = this.getPoints(img, canvas);
@@ -103,14 +96,14 @@ export class PolygonGenerator {
     this.uv = buffer.map(positions.slice(0), 2, (v) => {
       let x = v[0] + 0.5;
       x =
-        x / this.settings.horizontalSlices +
-        (1 / this.settings.horizontalSlices) * this.settings.horizontalIndex;
+        x / this.settings.slices[0] +
+        (1 / this.settings.slices[0]) * this.settings.indices[0];
 
       let y = v[1] + 0.5;
       y =
-        y / this.settings.verticalSlices +
+        y / this.settings.slices[1] +
         1 -
-        (1 / this.settings.verticalSlices) * (this.settings.verticalIndex + 1);
+        (1 / this.settings.slices[1]) * (this.settings.indices[1] + 1);
 
       return [x, y];
     }) as Float32Array;
@@ -123,14 +116,12 @@ export class PolygonGenerator {
     /**
      * Indices
      */
-    const hi = this.settings.horizontalIndex;
-    const vi = this.settings.verticalIndex;
+    const [hi, vi] = this.settings.indices;
 
     /**
      * Number of slices
      */
-    const hs = this.settings.horizontalSlices;
-    const vs = this.settings.verticalSlices;
+    const [hs, vs] = this.settings.slices;
 
     /**
      * Size of a single slice

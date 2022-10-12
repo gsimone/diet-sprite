@@ -75,10 +75,9 @@ export function MyFlipbook({
           ref={$mat}
           u_data={dataTexture}
           u_debugUv={1}
-          u_horizontalSlices={horizontalSlices}
           u_map={map}
+          u_slices={[horizontalSlices, verticalSlices]}
           u_vertices={vertices}
-          u_verticalSlices={verticalSlices}
           wireframe
         />
       </mesh>
@@ -89,10 +88,9 @@ export function MyFlipbook({
           ref={$mat2}
           transparent
           u_data={dataTexture}
-          u_horizontalSlices={horizontalSlices}
           u_map={map}
+          u_slices={[horizontalSlices, verticalSlices]}
           u_vertices={vertices}
-          u_verticalSlices={verticalSlices}
         />
       </mesh>
       <Text

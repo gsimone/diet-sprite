@@ -46,12 +46,12 @@ importers:
       '@types/react-dom': ^17.0.14
       '@types/three': ^0.139.0
       '@vitejs/plugin-react': ^1.3.0
+      diet-sprite: 0.0.1
       maath: ^0.0.2
       r3f-perf: ^6.2.6
       react: ^18.0.0
       react-dom: ^18.0.0
       react-dropzone: ^14.2.1
-      diet-sprite: 0.0.1
       three: ^0.139.2
       typescript: ^4.6.3
       vite: ^2.9.1
@@ -59,12 +59,12 @@ importers:
       '@react-three/drei': 9.1.2_4bhgcgkrokexspqltx2lequxou
       '@react-three/fiber': 8.0.10_vatykudawyxbpikjskz6eqooyu
       '@types/three': 0.139.0
+      diet-sprite: link:../packages/diet-sprite
       maath: 0.0.2_qfj7zc25lhtbyhzo45imoag7u4
       r3f-perf: 6.4.1_zg26kpz2222jjczthhcyjxdn5u
       react: 18.0.0
       react-dom: 18.0.0_react@18.0.0
       react-dropzone: 14.2.1_react@18.0.0
-      diet-sprite: link:../packages/diet-sprite
       three: 0.139.2
     devDependencies:
       '@types/react': 17.0.45
@@ -76,9 +76,11 @@ importers:
   packages/diet-sprite:
     specifiers:
       earcut: ^2.2.3
+      fast-memoize: ^2.5.2
       maath: ^0.0.2
     dependencies:
       earcut: 2.2.3
+      fast-memoize: 2.5.2
       maath: 0.0.2
 
 packages:
@@ -3995,6 +3997,10 @@ packages:
 
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
+    dev: false
+
+  /fast-memoize/2.5.2:
+    resolution: {integrity: sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw==}
     dev: false
 
   /fastq/1.13.0:

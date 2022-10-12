@@ -6,7 +6,6 @@ import * as misc from "maath/misc";
 import { convexhull, simplifyConvexHull, calcPolygonArea } from "./geometry";
 import { Point } from ".";
 import { addAxis, createBufferFromListOfPoints, getNeighbours } from "./utils";
-import * as debug from "./debug";
 import { checkPointAlpha } from "./filters";
 
 const createCanvas = (id = "debug-canvas", width: number, height: number) => {
@@ -134,21 +133,10 @@ export class PolygonGenerator {
 
       return [x, y];
     }) as Float32Array;
-
-    // debug.drawGrid(canvas, size[0], size[1]);
   }
 
-  /**
-   * Iterates over the image and returns an array of points that are over the alpha threshold.
-   * It reduces the number of returned points by excluding points that are surrounded by solid pixels.
-   *
-   * @param img An image element with the image already loaded
-   * @param canvas A canvas element to draw the image on in order to get the color values
-   * @returns
-   */
-  getPoints(img: HTMLImageElement, canvas: HTMLCanvasElement): Point[] {
+  getImageData(img: HTMLImageElement, canvas: HTMLCanvasElement) {
     const ctx = canvas.getContext("2d")!;
-
     ctx.drawImage(img, 0, 0);
 
     /**
@@ -171,40 +159,64 @@ export class PolygonGenerator {
 
     // get image data for hi, vi
     const imageData = ctx.getImageData(w * hi, h * vi, w, h);
+    return imageData;
+  }
+
+  /**
+   * Iterates over the image and returns an array of points that are over the alpha threshold.
+   * It reduces the number of returned points by excluding points that are surrounded by solid pixels.
+   *
+   * @param img An image element with the image already loaded
+   * @param canvas A canvas element to draw the image on in order to get the color values
+   * @returns
+   */
+  getPoints(img: HTMLImageElement, canvas: HTMLCanvasElement): Point[] {
+    const imageData = this.getImageData(img, canvas);
     const data = imageData.data;
 
     const points = [];
 
     const filterFn = this.settings.filter(this.settings.threshold);
 
-    const checkNeighbours =
-      (filterFn: (...channels: number[]) => boolean) => (n: number | null) =>
-        n !== null &&
-        filterFn(
-          data[n * 4],
-          data[n * 4 + 1],
-          data[n * 4 + 2],
-          data[n * 4 + 3]
-        );
+    const checkNeighbours = (index: number | null) =>
+      index !== null &&
+      filterFn(
+        data[index * 4],
+        data[index * 4 + 1],
+        data[index * 4 + 2],
+        data[index * 4 + 3]
+      );
 
     for (let i = 0; i < data.length; i += 4) {
-      if (filterFn(data[i + 0], data[i + 1], data[i + 2], data[i + 3])) {
+      const isValidPoint = filterFn(
+        data[i + 0],
+        data[i + 1],
+        data[i + 2],
+        data[i + 3]
+      );
+
+      if (isValidPoint) {
+        /**
+         * This drastically reduces the total amount of points that will be included in the hull calculation
+         * at the cost of checking each neighbour (4) for each valid sample.
+         **/
         const neighbours = getNeighbours(i, canvas.width, canvas.height);
-        // if neighbour are all opaque, never add point
-        if (neighbours.every(checkNeighbours(filterFn))) {
+
+        // if neighbour are all valid, never add point
+        if (neighbours.every(checkNeighbours)) {
           continue;
         }
 
         const [x, y] = misc.get2DFromIndex(i / 4, imageData.width);
 
-        points.push({ x: x, y });
+        points.push({ x, y });
       }
     }
 
     return points;
   }
 
-  calculateConvexHull(points: typeof this.points) {
+  calculateConvexHull(points: Point[]) {
     return convexhull.makeHull(points);
   }
 }

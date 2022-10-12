@@ -2,7 +2,13 @@ import { Canvas } from "@react-three/fiber";
 import { useDropzone } from "react-dropzone";
 
 import { OrbitControls, useTexture } from "@react-three/drei";
-import { Suspense, useCallback, useEffect, useState, useTransition } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import { folder, useControls } from "leva";
 import { extend } from "@react-three/fiber";
 
@@ -23,20 +29,20 @@ extend({
 function MyScene({ img }) {
   const controlsA = useControls({
     alphaThreshold: { value: 0, min: 0, max: 1, step: 0.001 },
-   
+
     vertices: { min: 3, max: 12, value: 8, step: 1 },
     debug: folder({
       fps: { min: 12, max: 120, value: 30 },
       showPolygon: true,
-    })
+    }),
   });
 
   const controlsB = useControls({
     sprite: folder({
       horizontalSlices: { min: 1, max: 20, step: 1, value: 5 },
       verticalSlices: { min: 1, max: 20, step: 1, value: 5 },
-    })
-  })
+    }),
+  });
 
   const controlsC = useControls(
     {
@@ -52,32 +58,32 @@ function MyScene({ img }) {
     [controlsB.horizontalSlices, controlsB.verticalSlices]
   );
 
-  const [transition, setTransition] = useTransition()
-  const [vertices, setVertices] = useState(8)
+  const [transition, setTransition] = useTransition();
+  const [vertices, setVertices] = useState(8);
 
   useEffect(() => {
     setTransition(() => {
-      setVertices(controlsA.vertices)
-    })
-  }, [controlsA.vertices])
-  
+      setVertices(controlsA.vertices);
+    });
+  }, [controlsA.vertices]);
+
   const controls = {
     ...controlsA,
     ...controlsB,
     ...controlsC,
-    vertices
-  }
+    vertices,
+  };
 
   const map = useTexture(img || "/assets/explosion.png") as Texture;
 
   return (
-    <group >
+    <group>
       <group position-x={8} scale={5}>
         <MyInstances map={map} {...controls} />
       </group>
       <MyFlipbook map={map} {...controls} />
       <group position-x={-8}>
-        <MySprite map={map} {...controls}  />
+        <MySprite map={map} {...controls} />
       </group>
     </group>
   );
@@ -115,7 +121,7 @@ export default () => {
         <Suspense fallback={null}>
           <MyScene img={img} />
 
-          <color attach="background" args={["#202339"]} />
+          <color attach="background" args={["#aaa"]} />
           <OrbitControls />
 
           <Perf position="bottom-right" matrixUpdate />

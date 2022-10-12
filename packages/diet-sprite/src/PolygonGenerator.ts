@@ -8,39 +8,6 @@ import { Point } from ".";
 import { addAxis, createBufferFromListOfPoints, getNeighbours } from "./utils";
 import { checkPointAlpha } from "./filters";
 
-const createCanvas = (id = "debug-canvas", width: number, height: number) => {
-  const canvas =
-    (document.querySelector(`#${id}`) as HTMLCanvasElement) ||
-    document.createElement("canvas");
-
-  canvas.id = id;
-
-  // document.body.appendChild(canvas);
-
-  canvas.width = width;
-  canvas.height = height;
-
-  canvas.id = id;
-
-  return canvas;
-};
-
-const normalizePositions = (
-  p: Point,
-  imageSize: number[],
-  horizontalSlices: number,
-  verticalSlices: number
-) => {
-  return {
-    x:
-      (p.x - imageSize[0] / (2 * horizontalSlices)) /
-      (imageSize[0] / horizontalSlices),
-    y:
-      (p.y - imageSize[1] / (2 * verticalSlices)) /
-      (imageSize[1] / verticalSlices),
-  };
-};
-
 export type Settings = {
   scale: number;
   threshold: number;
@@ -87,18 +54,23 @@ export class PolygonGenerator {
   ) {
     this.settings = { ...this.defaultSettings, ...settings };
 
+    const slices: [number, number] = [
+      this.settings.horizontalSlices,
+      this.settings.verticalSlices,
+    ];
+
     const canvas = createCanvas("bvc-image", img.width, img.height);
     this.points = this.getPoints(img, canvas);
 
-    let convexHull = this.calculateConvexHull(this.points);
-
-    const size = [this.settings.horizontalSlices, this.settings.verticalSlices];
+    let convexHull = convexhull.makeHull(this.points);
 
     const simplified = simplifyConvexHull(convexHull, vertices);
     const normalized = simplified.map((p) => {
-      let np = normalizePositions(p, [img.width, img.height], size[0], size[1]);
+      let np = normalizePositions(p, [img.width, img.height], slices);
 
-      // invert y
+      /**
+       * @todo should this be optional?
+       */
       np.y = -1 * np.y;
 
       return np;
@@ -109,16 +81,25 @@ export class PolygonGenerator {
     this.data.areaReduction =
       1 -
       (calcPolygonArea(simplified) /
-        ((img.width / size[0]) * (img.height / size[1]))) *
+        ((img.width / slices[0]) * (img.height / slices[1]))) *
         scale;
 
     // make a buffer from the simplified points since earcut requires it
     const positions = createBufferFromListOfPoints(normalized);
+    /**
+     * Use `earcut` to triangulate the points
+     * @see https://github.com/mapbox/earcut
+     **/
     const index = earcut(positions, null, 2);
 
     // transform the buffer to 3d with 0 z [1, 2, ...] > [1, 2, 0, ...]
     this.positions = addAxis(positions, 2, () => 0) as Float32Array;
     this.index = Uint32Array.from(index);
+
+    /**
+     * @note that this calculate can be easily done in the material.
+     * Removing this step would be a non-significant speed improvement
+     */
     this.uv = buffer.map(positions.slice(0), 2, (v) => {
       let x = v[0] + 0.5;
       x =
@@ -215,8 +196,34 @@ export class PolygonGenerator {
 
     return points;
   }
-
-  calculateConvexHull(points: Point[]) {
-    return convexhull.makeHull(points);
-  }
 }
+
+/**
+ * Creates and returns an html canvas element.
+ * Doesn't attach it to the body.
+ */
+const createCanvas = (id = "debug-canvas", width: number, height: number) => {
+  const canvas =
+    (document.querySelector(`#${id}`) as HTMLCanvasElement) ||
+    document.createElement("canvas");
+
+  canvas.id = id;
+
+  canvas.width = width;
+  canvas.height = height;
+
+  canvas.id = id;
+
+  return canvas;
+};
+
+const normalizePositions = (
+  p: Point,
+  imageSize: number[],
+  slices: number[]
+) => {
+  return {
+    x: (p.x - imageSize[0] / (2 * slices[0])) / (imageSize[0] / slices[0]),
+    y: (p.y - imageSize[1] / (2 * slices[1])) / (imageSize[1] / slices[1]),
+  };
+};

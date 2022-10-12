@@ -11,7 +11,7 @@ const MyMaterial = shaderMaterial(
     u_horizontalSlices: 4,
     u_verticalSlices: 4,
     u_vertices: 8,
-    u_debugUv: 0
+    u_debugUv: 0,
   },
   /* glsl */ `
   varying vec2 vUv;
@@ -80,6 +80,9 @@ const MyMaterial = shaderMaterial(
 `
 );
 
+/**
+ * Simple material that renders UVs
+ */
 const MyUVsMaterial = shaderMaterial(
   {},
   /* glsl */ `
@@ -137,6 +140,5 @@ const MyBillboardMaterial = shaderMaterial(
   }
 `
 );
-
 
 extend({ MyMaterial, MyBillboardMaterial, MyUVsMaterial });

@@ -4,3 +4,5 @@ export type Point = {
 };
 
 export * from "./ClippedSpriteGeometry";
+export * from "./ClippedFlipbookGeometry";
+export * from "./createClippedFlipbook";

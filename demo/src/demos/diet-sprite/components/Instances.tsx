@@ -1,12 +1,12 @@
-import { useLayoutEffect, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 
 import { useFrame } from "@react-three/fiber";
 import { InstancedMesh, NormalBlending, Object3D, Texture } from "three";
 
 import * as random from "maath/random";
 
-import { useClippedFlipbook } from "./Flipbook";
 import { materialKey } from "../materials";
+import { createClippedFlipbook } from "diet-sprite";
 
 type Props = {
   map: Texture;
@@ -22,24 +22,27 @@ export function MyInstances(props: Props) {
   const { map, fps, vertices, horizontalSlices, verticalSlices, threshold } =
     props;
 
-  const [geometry, dataTexture] = useClippedFlipbook(
-    map,
-    vertices,
-    horizontalSlices,
-    verticalSlices,
-    threshold
-  );
+  const [geometry, dataTexture] = useMemo(() => {
+    return createClippedFlipbook(
+      map.image,
+      vertices,
+      threshold,
+      horizontalSlices,
+      verticalSlices
+    );
+  }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
   const $mat = useRef();
 
   const $instancedMesh = useRef<InstancedMesh>();
 
   const count = 300;
-  const points = random.inSphere(new Float32Array(count * 3), {
-    radius: 0.5,
-  }) as Float32Array;
 
+  // distribute the instances in a sphere
   useLayoutEffect(() => {
+    const points = random.inSphere(new Float32Array(count * 3), {
+      radius: 0.5,
+    }) as Float32Array;
     const dummy = new Object3D();
     if ($instancedMesh.current) {
       for (let i = 0; i < points.length; i += 3) {

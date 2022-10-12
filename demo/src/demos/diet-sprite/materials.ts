@@ -17,8 +17,7 @@ const MyMaterial = shaderMaterial(
     u_data: null,
     u_map: null,
     u_index: 0,
-    u_horizontalSlices: 4,
-    u_verticalSlices: 4,
+    u_slices: [4, 4],
     u_vertices: 8,
     u_debugUv: 0,
   },
@@ -27,27 +26,26 @@ const MyMaterial = shaderMaterial(
   uniform sampler2D u_data;
   uniform float u_index;
 
-  uniform float u_horizontalSlices;
-  uniform float u_verticalSlices;
+  uniform vec2 u_slices;
   uniform float u_vertices;
   
   // returns the relative UVs in the flipbook given absolute UVs and flipbook data 
-  vec2 flipbookUv( vec2 uv, float horizontalSlices, float verticalSlices, float index ) {
-    float horizontalIndex = mod(index, horizontalSlices);
-    float verticalIndex = floor(index / horizontalSlices);
+  vec2 flipbookUv( vec2 uv, vec2 slices, float index ) {
+    float horizontalIndex = mod(index, slices.x);
+    float verticalIndex = floor(index / slices.x);
     
     float u = uv.x + 0.5;
-    u = u / horizontalSlices +  (1. / horizontalSlices) * horizontalIndex;
+    u = u / slices.x +  (1. / slices.x) * horizontalIndex;
 
     float v = uv.y + 0.5;
-    v = ( v / verticalSlices) + 1. - (1. / verticalSlices) * (verticalIndex + 1.);
+    v = ( v / slices.y) + 1. - (1. / slices.y) * (verticalIndex + 1.);
 
     return vec2(u, v);
   }
 
-  vec3 getPositionFromDataTexture( sampler2D dataTexture, int vertexID, float numberOfVertices, float horizontalSlices, float verticalSlices, float index) {
+  vec3 getPositionFromDataTexture( sampler2D dataTexture, int vertexID, float numberOfVertices, vec2 slices, float index) {
     float u = float( vertexID ) / numberOfVertices;
-    float total = horizontalSlices * verticalSlices;
+    float total = slices.x * slices.y;
     float v  = ( 1. / total ) * index;
     vec3 pos = texture2D( dataTexture, vec2( u, v ) ).rgb;
 
@@ -58,10 +56,10 @@ const MyMaterial = shaderMaterial(
   
   void main () {
     // the index is offset by gl_instanceID to give it some pizzaz
-    float offsetIndex = u_index - mod(float(gl_InstanceID), u_horizontalSlices * u_verticalSlices);
+    float offsetIndex = u_index - mod(float(gl_InstanceID), u_slices.x * u_slices.y);
 
-    vec3 pos = getPositionFromDataTexture( u_data, gl_VertexID, u_vertices, u_horizontalSlices, u_verticalSlices, offsetIndex );
-    vUv = flipbookUv( pos.xy, u_horizontalSlices, u_verticalSlices, offsetIndex );
+    vec3 pos = getPositionFromDataTexture( u_data, gl_VertexID, u_vertices, u_slices, offsetIndex );
+    vUv = flipbookUv( pos.xy, u_slices, offsetIndex );
 
     #ifdef USE_INSTANCING
       pos = (instanceMatrix * vec4(pos, 1.0)).xyz;

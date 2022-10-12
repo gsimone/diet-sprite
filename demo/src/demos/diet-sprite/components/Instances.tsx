@@ -76,10 +76,9 @@ export function MyInstances(props: Props) {
         blending={NormalBlending}
         depthWrite={false}
         u_data={dataTexture}
-        u_horizontalSlices={horizontalSlices}
+        u_slices={[horizontalSlices, verticalSlices]}
         u_map={map}
         u_vertices={vertices}
-        u_verticalSlices={verticalSlices}
         transparent
       />
     </instancedMesh>

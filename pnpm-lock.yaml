@@ -76,11 +76,9 @@ importers:
   packages/diet-sprite:
     specifiers:
       earcut: ^2.2.3
-      fast-memoize: ^2.5.2
       maath: ^0.0.2
     dependencies:
       earcut: 2.2.3
-      fast-memoize: 2.5.2
       maath: 0.0.2
 
 packages:
@@ -3997,10 +3995,6 @@ packages:
 
   /fast-levenshtein/2.0.6:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
-    dev: false
-
-  /fast-memoize/2.5.2:
-    resolution: {integrity: sha512-Ue0LwpDYErFbmNnZSF0UH6eImUwDmogUO1jyE+JbN2gsQz/jICm1Ve7t9QT0rNSsfJt+Hs4/S3GnsDVjL4HVrw==}
     dev: false
 
   /fastq/1.13.0:

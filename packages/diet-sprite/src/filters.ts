@@ -1,5 +1,5 @@
 export const checkPointAlpha =
-  (threshold: number) =>
+  (_threshold: number) =>
   (...rgba: number[]) => {
     return rgba[3] / 255 > 0;
   };

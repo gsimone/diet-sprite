@@ -46,10 +46,8 @@ export function MySprite({
             map,
             vertices,
             threshold,
-            horizontalSlices,
-            verticalSlices,
-            horizontalIndex,
-            verticalIndex,
+            [horizontalSlices, verticalSlices],
+            [horizontalIndex, verticalIndex],
           ]}
         />
         <myBillboardMaterial
@@ -66,10 +64,8 @@ export function MySprite({
             map,
             vertices,
             threshold,
-            horizontalSlices,
-            verticalSlices,
-            horizontalIndex,
-            verticalIndex,
+            [horizontalSlices, verticalSlices],
+            [horizontalIndex, verticalIndex],
           ]}
         />
         <myUVsMaterial depthTest={false} wireframe transparent />
@@ -81,7 +77,7 @@ export function MySprite({
         anchorX="right"
         anchorY="top"
       >
-        {reduction}%
+        Area difference: {reduction}%
       </Text>
     </group>
   );

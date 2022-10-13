@@ -2,7 +2,13 @@ import { Canvas } from "@react-three/fiber";
 import { useDropzone } from "react-dropzone";
 
 import { OrbitControls, useTexture } from "@react-three/drei";
-import { Suspense, useCallback, useEffect, useState, useTransition } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useState,
+  useTransition,
+} from "react";
 import { folder, useControls } from "leva";
 import { extend } from "@react-three/fiber";
 
@@ -20,23 +26,32 @@ extend({
   ClippedFlipbookGeometry,
 });
 
-function MyScene({ img }) {
+function MyScene({ img, ...props }) {
+  const { mode } = useControls({
+    mode: {
+      value: "all",
+      options: ["sprite", "flipbook", "flipbook-instances", "all"],
+    },
+  });
+
   const controlsA = useControls({
-    alphaThreshold: { value: 0, min: 0, max: 1, step: 0.001 },
-   
-    vertices: { min: 3, max: 12, value: 8, step: 1 },
+    settings: folder({
+      vertices: { value: 6, min: 3, max: 40, step: 1 },
+      threshold: { value: 0, min: 0, max: 1, step: 0.001 },
+    }),
+
     debug: folder({
       fps: { min: 12, max: 120, value: 30 },
       showPolygon: true,
-    })
+    }),
   });
 
   const controlsB = useControls({
     sprite: folder({
       horizontalSlices: { min: 1, max: 20, step: 1, value: 5 },
       verticalSlices: { min: 1, max: 20, step: 1, value: 5 },
-    })
-  })
+    }),
+  });
 
   const controlsC = useControls(
     {
@@ -52,38 +67,54 @@ function MyScene({ img }) {
     [controlsB.horizontalSlices, controlsB.verticalSlices]
   );
 
-  const [transition, setTransition] = useTransition()
-  const [vertices, setVertices] = useState(8)
-
-  useEffect(() => {
-    setTransition(() => {
-      setVertices(controlsA.vertices)
-    })
-  }, [controlsA.vertices])
-  
   const controls = {
     ...controlsA,
     ...controlsB,
     ...controlsC,
-    vertices
-  }
+  };
 
   const map = useTexture(img || "/assets/explosion.png") as Texture;
 
-  return (
-    <group >
-      <group position-x={8} scale={5}>
+  if (mode === "sprite") {
+    return (
+      <group {...props}>
+        <MySprite map={map} {...controls} />
+      </group>
+    );
+  }
+
+  if (mode === "flipbook") {
+    return (
+      <group {...props}>
+        <MyFlipbook map={map} {...controls} />
+      </group>
+    );
+  }
+
+  if (mode === "flipbook-instances") {
+    return (
+      <group {...props} scale={5}>
         <MyInstances map={map} {...controls} />
       </group>
-      <MyFlipbook map={map} {...controls} />
-      <group position-x={-8}>
-        <MySprite map={map} {...controls}  />
+    );
+  }
+
+  if (mode === "all") {
+    return (
+      <group {...props}>
+        <group position-x={8} scale={5}>
+          <MyInstances map={map} {...controls} />
+        </group>
+        <MyFlipbook map={map} {...controls} />
+        <group position-x={-8}>
+          <MySprite map={map} {...controls} />
+        </group>
       </group>
-    </group>
-  );
+    );
+  }
 }
 
-export default () => {
+const Scene = () => {
   const [img, setImg] = useState();
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -100,7 +131,7 @@ export default () => {
       reader.readAsDataURL(file);
     });
   }, []);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+  const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
     <div
@@ -111,11 +142,15 @@ export default () => {
       }}
     >
       <input {...getInputProps()} />
-      <Canvas camera={{ position: [0, 0, 5], zoom: 65 }} orthographic dpr={2}>
+      <Canvas
+        camera={{ position: [0, 0, 5], zoom: 65, near: 0.00001, far: 10000 }}
+        orthographic
+        dpr={2}
+      >
         <Suspense fallback={null}>
           <MyScene img={img} />
 
-          <color attach="background" args={["#202339"]} />
+          <color attach="background" args={["#aaa"]} />
           <OrbitControls />
 
           <Perf position="bottom-right" matrixUpdate />
@@ -124,3 +159,5 @@ export default () => {
     </div>
   );
 };
+
+export default Scene;

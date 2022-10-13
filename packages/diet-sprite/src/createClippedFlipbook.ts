@@ -26,10 +26,9 @@ export function createClippedFlipbook(
   imageOrTexture: HTMLImageElement | Texture,
   vertices: number,
   threshold: number,
-  horizontalSlices: number,
-  verticalSlices: number
+  slices: [number, number]
 ): FlipbookData {
-  const total = horizontalSlices * verticalSlices;
+  const total = slices[0] * slices[1];
   const positions = new Float32Array(total * vertices * 4);
 
   let finalGeometry: BufferGeometry = null!;
@@ -49,10 +48,8 @@ export function createClippedFlipbook(
       imageOrTexture,
       vertices,
       threshold,
-      horizontalSlices,
-      verticalSlices,
-      i % horizontalSlices,
-      Math.floor(i / horizontalSlices)
+      slices,
+      [i % slices[0], Math.floor(i / slices[0])]
     );
 
     const pos = geometry.attributes.position.array;

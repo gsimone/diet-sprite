@@ -2,12 +2,16 @@ import { BufferAttribute, BufferGeometry, Texture } from "three";
 import { PolygonGenerator } from "./PolygonGenerator";
 import { fillBuffer } from "./utils";
 
-const DEFAULT_SETTINGS = {
+type Settings = {
+  threshold: number;
+  slices: [number, number];
+  indices: [number, number];
+};
+
+const DEFAULT_SETTINGS: Settings = {
   threshold: 0.01,
-  horizontalSlices: 1,
-  verticalSlices: 1,
-  horizontalIndex: 0,
-  verticalIndex: 0,
+  slices: [1, 1],
+  indices: [1, 1],
 };
 
 export class ClippedSpriteGeometry extends BufferGeometry {
@@ -18,11 +22,9 @@ export class ClippedSpriteGeometry extends BufferGeometry {
   constructor(
     imageOrTexture: HTMLImageElement | Texture,
     vertices = 8,
-    threshold = 0.01,
-    horizontalSlices = 1,
-    verticalSlices = 1,
-    horizontalIndex = 0,
-    verticalIndex = 0
+    threshold = 0.01 as Settings["threshold"],
+    slices = [1, 1] as Settings["slices"],
+    indices = [0, 0] as Settings["indices"]
   ) {
     super();
 
@@ -30,10 +32,8 @@ export class ClippedSpriteGeometry extends BufferGeometry {
     this.settings = {
       ...this.settings,
       threshold,
-      horizontalSlices,
-      verticalSlices,
-      horizontalIndex,
-      verticalIndex,
+      slices,
+      indices,
     };
 
     this.image =

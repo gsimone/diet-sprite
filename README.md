@@ -6,6 +6,7 @@
 <br />
 <br />
 
+
 ## Features
 
 - Given a simple transparent image and an alpha threshold, generates a tight mesh around the non-transparent pixels. Depending on how big the texture is being drawn on screen, this will result in notable performance gains.

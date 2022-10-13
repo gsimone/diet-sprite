@@ -66,6 +66,10 @@ Alternatively, the vertex positions can be generated as an array of vertices and
 
 Note that the generated geometry only holds the correct amount of vertices and the necessary index.
 
+### TODO
+
+- [ ] Contain mode: This would be useful for those cases where you might want to avoid the complexity of fetching the polygon data from the data texture. It would only return the single optimized geometry that can fit ALL the flipbook pages. This means generally lower fill-rate savings but it might be good for imposter sprites, as they are supposed to be a minimal % of fill.
+
 
 ## Test tool
 

@@ -26,11 +26,20 @@ extend({
   ClippedFlipbookGeometry,
 });
 
-function MyScene({ img }) {
-  const controlsA = useControls({
-    alphaThreshold: { value: 0, min: 0, max: 1, step: 0.001 },
+function MyScene({ img, ...props }) {
+  const { mode } = useControls({
+    mode: {
+      value: "all",
+      options: ["sprite", "flipbook", "flipbook-instances", "all"],
+    },
+  });
 
-    vertices: { min: 3, max: 12, value: 8, step: 1 },
+  const controlsA = useControls({
+    settings: folder({
+      vertices: { value: 6, min: 3, max: 40, step: 1 },
+      threshold: { value: 0, min: 0, max: 1, step: 0.001 },
+    }),
+
     debug: folder({
       fps: { min: 12, max: 120, value: 30 },
       showPolygon: true,
@@ -58,38 +67,54 @@ function MyScene({ img }) {
     [controlsB.horizontalSlices, controlsB.verticalSlices]
   );
 
-  const [transition, setTransition] = useTransition();
-  const [vertices, setVertices] = useState(8);
-
-  useEffect(() => {
-    setTransition(() => {
-      setVertices(controlsA.vertices);
-    });
-  }, [controlsA.vertices]);
-
   const controls = {
     ...controlsA,
     ...controlsB,
     ...controlsC,
-    vertices,
   };
 
   const map = useTexture(img || "/assets/explosion.png") as Texture;
 
-  return (
-    <group>
-      <group position-x={8} scale={5}>
-        <MyInstances map={map} {...controls} />
-      </group>
-      <MyFlipbook map={map} {...controls} />
-      <group position-x={-8}>
+  if (mode === "sprite") {
+    return (
+      <group {...props}>
         <MySprite map={map} {...controls} />
       </group>
-    </group>
-  );
+    );
+  }
+
+  if (mode === "flipbook") {
+    return (
+      <group {...props}>
+        <MyFlipbook map={map} {...controls} />
+      </group>
+    );
+  }
+
+  if (mode === "flipbook-instances") {
+    return (
+      <group {...props} scale={5}>
+        <MyInstances map={map} {...controls} />
+      </group>
+    );
+  }
+
+  if (mode === "all") {
+    return (
+      <group {...props}>
+        <group position-x={8} scale={5}>
+          <MyInstances map={map} {...controls} />
+        </group>
+        <MyFlipbook map={map} {...controls} />
+        <group position-x={-8}>
+          <MySprite map={map} {...controls} />
+        </group>
+      </group>
+    );
+  }
 }
 
-export default () => {
+const Scene = () => {
   const [img, setImg] = useState();
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -134,3 +159,5 @@ export default () => {
     </div>
   );
 };
+
+export default Scene;

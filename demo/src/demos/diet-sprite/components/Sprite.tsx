@@ -77,7 +77,7 @@ export function MySprite({
         anchorX="right"
         anchorY="top"
       >
-        {reduction}%
+        Area difference: {reduction}%
       </Text>
     </group>
   );

@@ -1,13 +1,15 @@
-import { Billboard, Plane, Text } from "@react-three/drei";
+import { Edges, Plane, Text } from "@react-three/drei";
 import { folder, useControls } from "leva";
 import { useLayoutEffect, useRef, useState } from "react";
 import { BufferGeometry } from "three";
+import { DebugBackground } from "./DebugBackground";
+import { DebugText } from "./DebugText";
 
 export function MySprite({
   map,
   index,
   vertices,
-  showPolygon,
+  debug,
   threshold,
   horizontalSlices,
   verticalSlices,
@@ -32,14 +34,11 @@ export function MySprite({
   ]);
 
   return (
-    <group {...props}>
-      <Billboard>
-        <Plane scale={6}>
-          <meshBasicMaterial wireframe transparent opacity={0.3} />
-        </Plane>
-      </Billboard>
+    <group {...props} scale={6}>
+      {debug && <DebugBackground />}
+      {debug && <DebugText>Area difference: {reduction}%</DebugText>}
 
-      <mesh scale={6}>
+      <mesh>
         <clippedSpriteGeometry
           ref={ref}
           args={[
@@ -58,7 +57,7 @@ export function MySprite({
         />
       </mesh>
 
-      <mesh scale={6} visible={showPolygon}>
+      <mesh visible={debug}>
         <clippedSpriteGeometry
           args={[
             map,
@@ -70,15 +69,6 @@ export function MySprite({
         />
         <myUVsMaterial depthTest={false} wireframe transparent />
       </mesh>
-      <Text
-        fontSize={0.2}
-        position-y={-3.25}
-        position-x={3}
-        anchorX="right"
-        anchorY="top"
-      >
-        Area difference: {reduction}%
-      </Text>
     </group>
   );
 }

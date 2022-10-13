@@ -11,7 +11,6 @@ import { createClippedFlipbook } from "diet-sprite";
 type Props = {
   map: Texture;
   fps: boolean;
-  showPolygon: boolean;
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
@@ -73,8 +72,8 @@ export function MyInstances(props: Props) {
         blending={NormalBlending}
         depthWrite={false}
         u_data={dataTexture}
-        u_slices={[horizontalSlices, verticalSlices]}
         u_map={map}
+        u_slices={[horizontalSlices, verticalSlices]}
         u_vertices={vertices}
         transparent
       />

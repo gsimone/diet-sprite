@@ -1,15 +1,17 @@
-import { Plane, Text } from "@react-three/drei";
+import { Billboard, Plane, Text } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 
 import { createClippedFlipbook } from "diet-sprite";
 import { materialKey } from "../materials";
 import { useFrame } from "@react-three/fiber";
 import { Texture } from "three";
+import { DebugBackground } from "./DebugBackground";
+import { DebugText } from "./DebugText";
 
 type MyFlipbookProps = {
   map: Texture;
   fps: number;
-  showPolygon: boolean;
+  debug: boolean;
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
@@ -19,7 +21,7 @@ type MyFlipbookProps = {
 export function MyFlipbook({
   map,
   fps = 30,
-  showPolygon,
+  debug,
   vertices,
   horizontalSlices,
   verticalSlices,
@@ -49,20 +51,25 @@ export function MyFlipbook({
   });
 
   return (
-    <group {...props}>
-      <Plane scale={6}>
-        <meshBasicMaterial wireframe transparent opacity={0.3} />
-      </Plane>
+    <group {...props} scale={6}>
+      {debug && <DebugBackground />}
+      {debug && (
+        <DebugText>
+          avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% -
+          max {format(savings.max * 100)}%
+        </DebugText>
+      )}
 
-      <mesh scale-y={-6} position-x={3.5}>
-        <planeGeometry />
-        <meshBasicMaterial map={dataTexture} color="white" />
-      </mesh>
+      {debug && (
+        <mesh position-x={0.65} scale-x={1 / 4}>
+          <planeGeometry />
+          <meshBasicMaterial map={dataTexture} color="white" />
+        </mesh>
+      )}
 
       <mesh
-        scale={6.1}
         renderOrder={1}
-        visible={showPolygon}
+        visible={debug}
         geometry={geometry}
         position-z={0.1}
       >
@@ -79,7 +86,7 @@ export function MyFlipbook({
         />
       </mesh>
 
-      <mesh scale={6} geometry={geometry}>
+      <mesh geometry={geometry}>
         <myMaterial
           key={materialKey}
           ref={$mat2}
@@ -90,16 +97,6 @@ export function MyFlipbook({
           u_vertices={vertices}
         />
       </mesh>
-      <Text
-        fontSize={0.2}
-        position-y={-3.25}
-        position-x={3}
-        anchorX="right"
-        anchorY="top"
-      >
-        avg {format(savings.avg * 100)}% - min {format(savings.min * 100)}% -
-        max {format(savings.max * 100)}%
-      </Text>
     </group>
   );
 }

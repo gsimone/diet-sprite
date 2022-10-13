@@ -2,13 +2,7 @@ import { Canvas } from "@react-three/fiber";
 import { useDropzone } from "react-dropzone";
 
 import { OrbitControls, useTexture } from "@react-three/drei";
-import {
-  Suspense,
-  useCallback,
-  useEffect,
-  useState,
-  useTransition,
-} from "react";
+import { Suspense, useCallback, useState } from "react";
 import { folder, useControls } from "leva";
 import { extend } from "@react-three/fiber";
 
@@ -26,23 +20,11 @@ extend({
   ClippedFlipbookGeometry,
 });
 
-function MyScene({ img, ...props }) {
-  const { mode } = useControls({
-    mode: {
-      value: "all",
-      options: ["sprite", "flipbook", "flipbook-instances", "all"],
-    },
-  });
-
+function MyScene({ img, debug, mode, ...props }) {
   const controlsA = useControls({
     settings: folder({
       vertices: { value: 6, min: 3, max: 40, step: 1 },
       threshold: { value: 0, min: 0, max: 1, step: 0.001 },
-    }),
-
-    debug: folder({
-      fps: { min: 12, max: 120, value: 30 },
-      showPolygon: true,
     }),
   });
 
@@ -50,6 +32,8 @@ function MyScene({ img, ...props }) {
     sprite: folder({
       horizontalSlices: { min: 1, max: 20, step: 1, value: 5 },
       verticalSlices: { min: 1, max: 20, step: 1, value: 5 },
+      animate: true,
+      fps: { min: 12, max: 120, value: 30 },
     }),
   });
 
@@ -71,6 +55,7 @@ function MyScene({ img, ...props }) {
     ...controlsA,
     ...controlsB,
     ...controlsC,
+    debug,
   };
 
   const map = useTexture(img || "/assets/explosion.png") as Texture;
@@ -115,6 +100,15 @@ function MyScene({ img, ...props }) {
 }
 
 const Scene = () => {
+  const { mode, debug } = useControls({
+    debug: true,
+
+    mode: {
+      value: "all",
+      options: ["sprite", "flipbook", "flipbook-instances", "all"],
+    },
+  });
+
   const [img, setImg] = useState();
   const onDrop = useCallback((acceptedFiles) => {
     acceptedFiles.forEach((file) => {
@@ -148,12 +142,12 @@ const Scene = () => {
         dpr={2}
       >
         <Suspense fallback={null}>
-          <MyScene img={img} />
+          <MyScene key={mode} debug={debug} mode={mode} img={img} />
 
-          <color attach="background" args={["#aaa"]} />
+          <color attach="background" args={["#333"]} />
           <OrbitControls />
 
-          <Perf position="bottom-right" matrixUpdate />
+          {debug && <Perf position="bottom-right" matrixUpdate />}
         </Suspense>
       </Canvas>
     </div>

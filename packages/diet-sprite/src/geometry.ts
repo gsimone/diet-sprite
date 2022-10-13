@@ -77,7 +77,7 @@ export function simplifyConvexHull(
   convexHull: Point[],
   desiredNumberOfPoints: number = 8
 ) {
-  const simplified = [...convexHull];
+  const simplified = convexHull.slice();
 
   let iterations = 0;
   while (simplified.length > desiredNumberOfPoints && iterations < 1000) {

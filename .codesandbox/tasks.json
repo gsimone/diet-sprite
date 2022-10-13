@@ -10,7 +10,7 @@
   // These tasks can be run from CodeSandbox. Running one will open a log in the app.
   "tasks": {
     "demo": {
-      "name": "Run Demo",
+      "name": "Demo",
       "command": "pnpm demo",
       "runAtStart": true,
       "preview": {

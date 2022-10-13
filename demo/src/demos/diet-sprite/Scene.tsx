@@ -117,7 +117,11 @@ export default () => {
       }}
     >
       <input {...getInputProps()} />
-      <Canvas camera={{ position: [0, 0, 5], zoom: 65 }} orthographic dpr={2}>
+      <Canvas
+        camera={{ position: [0, 0, 5], zoom: 65, near: 0.00001, far: 10000 }}
+        orthographic
+        dpr={2}
+      >
         <Suspense fallback={null}>
           <MyScene img={img} />
 

@@ -144,7 +144,7 @@ const Scene = () => {
         <Suspense fallback={null}>
           <MyScene key={mode} debug={debug} mode={mode} img={img} />
 
-          <color attach="background" args={["#333"]} />
+          <color attach="background" args={["#aaa"]} />
           <OrbitControls />
 
           {debug && <Perf position="bottom-right" matrixUpdate />}

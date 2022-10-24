@@ -1,0 +1,4 @@
+{
+  "main": "dist/diet-sprite-filters.cjs.js",
+  "module": "dist/diet-sprite-filters.esm.js"
+}

@@ -1,12 +1,13 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 
 import { useFrame } from "@react-three/fiber";
-import { InstancedMesh, NormalBlending, Object3D, Texture } from "three";
+import { InstancedMesh, Material, NormalBlending, Object3D, Texture } from "three";
 
 import * as random from "maath/random";
 
 import { materialKey } from "../materials";
 import { createClippedFlipbook } from "diet-sprite";
+import { MyMaterial } from "../materials/MyMaterial";
 
 type Props = {
   map: Texture;
@@ -28,7 +29,7 @@ export function MyInstances(props: Props) {
     ]);
   }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
-  const $mat = useRef();
+  const $mat = useRef<Material>();
 
   const $instancedMesh = useRef<InstancedMesh>();
 
@@ -52,29 +53,21 @@ export function MyInstances(props: Props) {
     }
   }, []);
 
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if ($mat.current) {
-      $mat.current.uniforms.u_index.value =
-        Math.floor(t * fps) % (horizontalSlices * verticalSlices);
-    }
-  });
-
   return (
     <instancedMesh
       ref={$instancedMesh}
       geometry={geometry}
       args={[undefined, undefined, count]}
     >
-      <myMaterial
+      <MyMaterial
         ref={$mat}
         key={materialKey}
         blending={NormalBlending}
         depthWrite={false}
-        u_data={dataTexture}
-        u_map={map}
-        u_slices={[horizontalSlices, verticalSlices]}
-        u_vertices={vertices}
+        dataTexture={dataTexture}
+        flipbookMap={map}
+        size={[horizontalSlices, verticalSlices]}
+        vertices={vertices}
         transparent
       />
     </instancedMesh>

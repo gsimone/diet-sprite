@@ -49,10 +49,7 @@ export function MySprite({
             [horizontalIndex, verticalIndex],
           ]}
         />
-        <BillboardMaterial
-          map={map}
-          transparent
-        />
+        <BillboardMaterial map={map} transparent />
       </mesh>
 
       <mesh visible={debug}>

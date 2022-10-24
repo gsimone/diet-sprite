@@ -1,8 +1,10 @@
+import { FC } from "react";
 import { UV, Vec2, Vec3, VertexPosition, ViewMatrix } from "shader-composer";
 import { Shader, ShaderMaster, useShader } from "shader-composer-r3f";
+import { MeshBasicMaterialParameters } from "three";
 import { BillboardUnit } from "./common";
 
-export const UVMaterial = () => {
+export const UVMaterial: FC<MeshBasicMaterialParameters> = (props) => {
   const shader = useShader(() => {
 
     return ShaderMaster({
@@ -12,7 +14,7 @@ export const UVMaterial = () => {
   })
 
   return (
-    <meshBasicMaterial wireframe>
+    <meshBasicMaterial {...props}>
       <Shader {...shader} />
     </meshBasicMaterial>
   );

@@ -1,17 +1,23 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 
 import { useFrame } from "@react-three/fiber";
-import { InstancedMesh, Material, MeshBasicMaterial, NormalBlending, Object3D, Texture } from "three";
+import {
+  InstancedMesh,
+  Material,
+  MeshBasicMaterial,
+  NormalBlending,
+  Object3D,
+  Texture,
+} from "three";
 
 import * as random from "maath/random";
 
-import { materialKey } from "../materials";
 import { createClippedFlipbook } from "diet-sprite";
 import { MyMaterial } from "../materials/MyMaterial";
 
 type Props = {
   map: Texture;
-  fps: boolean;
+  fps: number;
   vertices: number;
   horizontalSlices: number;
   verticalSlices: number;
@@ -61,13 +67,13 @@ export function MyInstances(props: Props) {
     >
       <MyMaterial
         ref={$mat}
-        key={materialKey}
         blending={NormalBlending}
         depthWrite={false}
         dataTexture={dataTexture}
         flipbookMap={map}
         size={[horizontalSlices, verticalSlices]}
         vertices={vertices}
+        fps={fps}
         transparent
       />
     </instancedMesh>

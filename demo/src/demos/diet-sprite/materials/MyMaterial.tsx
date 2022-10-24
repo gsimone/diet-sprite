@@ -76,6 +76,7 @@ interface MaterialProps extends MeshBasicMaterialParameters {
   vertices: number;
   flipbookMap: Texture;
   fps?: number;
+  debug?: boolean;
 };
 
 export const MyMaterial = forwardRef<Material, MaterialProps>(
@@ -86,6 +87,7 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
       size = [1, 1],
       flipbookMap,
       vertices = 8,
+      debug = false,
       ...props
     },
     ref
@@ -127,7 +129,7 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
 
       return ShaderMaster({
         position: BillboardUnit(Vec2(position), ViewMatrix),
-        color: color.color,
+        color: debug ? Vec3([flipbookUVs, 0.]) : color.color,
         alpha: color.alpha,
       });
     });

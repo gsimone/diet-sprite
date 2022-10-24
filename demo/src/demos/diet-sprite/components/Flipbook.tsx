@@ -1,10 +1,7 @@
-import { Billboard, Plane, Text } from "@react-three/drei";
 import { useMemo, useRef } from "react";
 
 import { createClippedFlipbook } from "diet-sprite";
-import { materialKey } from "../materials";
-import { useFrame } from "@react-three/fiber";
-import { Material, MeshBasicMaterial, Texture } from "three";
+import { MeshBasicMaterial, Texture } from "three";
 import { DebugBackground } from "./DebugBackground";
 import { DebugText } from "./DebugText";
 import { MyMaterial } from "../materials/MyMaterial";
@@ -60,12 +57,11 @@ export function MyFlipbook({
         renderOrder={1}
         visible={debug}
         geometry={geometry}
-        position-z={0.1}
       >
         <MyMaterial
+          debug
           wireframe
           ref={$mat}
-          key={materialKey}
           flipbookMap={map}
           dataTexture={dataTexture}
           size={[horizontalSlices, verticalSlices]}
@@ -75,9 +71,8 @@ export function MyFlipbook({
 
       <mesh geometry={geometry}>
         <MyMaterial
-          ref={$mat2}
-          key={materialKey}
           transparent
+          ref={$mat2}
           flipbookMap={map}
           dataTexture={dataTexture}
           size={[horizontalSlices, verticalSlices]}

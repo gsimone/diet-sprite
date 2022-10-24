@@ -1,7 +1,7 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 
 import { useFrame } from "@react-three/fiber";
-import { InstancedMesh, Material, NormalBlending, Object3D, Texture } from "three";
+import { InstancedMesh, Material, MeshBasicMaterial, NormalBlending, Object3D, Texture } from "three";
 
 import * as random from "maath/random";
 
@@ -29,7 +29,7 @@ export function MyInstances(props: Props) {
     ]);
   }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
 
-  const $mat = useRef<Material>();
+  const $mat = useRef<MeshBasicMaterial>(null!);
 
   const $instancedMesh = useRef<InstancedMesh>();
 

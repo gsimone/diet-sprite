@@ -2,8 +2,8 @@ import { useLayoutEffect, useRef, useState } from "react";
 import { BufferGeometry } from "three";
 import { BillboardMaterial } from "../materials/BillboardMaterial";
 import { UVMaterial } from "../materials/UVMaterial";
-import { DebugBackground } from "./DebugBackground";
-import { DebugText } from "./DebugText";
+import { DebugBackground } from "./internal/DebugBackground";
+import { DebugText } from "./internal/DebugText";
 
 export function MySprite({
   map,

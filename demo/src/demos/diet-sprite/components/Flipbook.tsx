@@ -2,8 +2,8 @@ import { useMemo, useRef } from "react";
 
 import { createClippedFlipbook } from "diet-sprite";
 import { MeshBasicMaterial, Texture } from "three";
-import { DebugBackground } from "./DebugBackground";
-import { DebugText } from "./DebugText";
+import { DebugBackground } from "./internal/DebugBackground";
+import { DebugText } from "./internal/DebugText";
 import { MyMaterial } from "../materials/MyMaterial";
 
 type MyFlipbookProps = {

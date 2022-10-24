@@ -24,7 +24,7 @@ import {
   useShader,
   useUniformUnit,
 } from "shader-composer-r3f";
-import { DataTexture, Material, Texture, Vector2 } from "three";
+import { DataTexture, Material, MeshBasicMaterial, MeshBasicMaterialParameters, Texture, Vector2 } from "three";
 import { billboardChunk } from "./common";
 
 import { pipe } from "fp-ts/lib/function";
@@ -69,9 +69,8 @@ const getPositionFromDataTexture = (
   return pos;
 };
 
-type MaterialProps = {
+interface MaterialProps extends MeshBasicMaterialParameters {
   dataTexture: DataTexture;
-  index: number;
   size: [number, number];
   vertices: number;
   flipbookMap: Texture;

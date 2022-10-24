@@ -4,7 +4,7 @@ import { useMemo, useRef } from "react";
 import { createClippedFlipbook } from "diet-sprite";
 import { materialKey } from "../materials";
 import { useFrame } from "@react-three/fiber";
-import { Material, Texture } from "three";
+import { Material, MeshBasicMaterial, Texture } from "three";
 import { DebugBackground } from "./DebugBackground";
 import { DebugText } from "./DebugText";
 import { MyMaterial } from "../materials/MyMaterial";
@@ -29,8 +29,8 @@ export function MyFlipbook({
   threshold,
   ...props
 }: MyFlipbookProps) {
-  const $mat = useRef<Material>();
-  const $mat2 = useRef<Material>();
+  const $mat = useRef<MeshBasicMaterial>(null!);
+  const $mat2 = useRef<MeshBasicMaterial>(null!);
 
   const [geometry, dataTexture, _, savings] = useMemo(() => {
     return createClippedFlipbook(map.image, vertices, threshold, [
@@ -38,18 +38,6 @@ export function MyFlipbook({
       verticalSlices,
     ]);
   }, [map.image, vertices, horizontalSlices, verticalSlices, threshold]);
-
-  // /**
-  //  * Animates the u_index uniform to go through the flipbook
-  //  */
-  // useFrame(({ clock }) => {
-  //   const t = clock.getElapsedTime();
-  //   if ($mat.current && $mat2.current) {
-  //     $mat.current.uniforms.u_index.value =
-  //       $mat2.current.uniforms.u_index.value =
-  //         Math.floor(t * fps) % (horizontalSlices * verticalSlices);
-  //   }
-  // });
 
   return (
     <group {...props} scale={6}>
@@ -75,10 +63,9 @@ export function MyFlipbook({
         position-z={0.1}
       >
         <MyMaterial
-          ref={$mat}
-          depthRead={false}
-          key={materialKey}
           wireframe
+          ref={$mat}
+          key={materialKey}
           flipbookMap={map}
           dataTexture={dataTexture}
           size={[horizontalSlices, verticalSlices]}

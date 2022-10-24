@@ -51,8 +51,6 @@ export function MySprite({
         />
         <BillboardMaterial
           map={map}
-          transparent
-          alphaTest={threshold}
           alphaMap={map}
         />
       </mesh>

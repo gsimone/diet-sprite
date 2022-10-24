@@ -33,7 +33,7 @@ export function MyInstances(props: Props) {
 
   const $instancedMesh = useRef<InstancedMesh>();
 
-  const count = 300;
+  const count = 1_000;
 
   // distribute the instances in a sphere
   useLayoutEffect(() => {

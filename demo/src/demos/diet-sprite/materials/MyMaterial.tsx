@@ -17,6 +17,7 @@ import {
   Vec2,
   Vec3,
   VertexID,
+  ViewMatrix,
 } from "shader-composer";
 import {
   Shader,
@@ -25,7 +26,7 @@ import {
   useUniformUnit,
 } from "shader-composer-r3f";
 import { DataTexture, Material, MeshBasicMaterial, MeshBasicMaterialParameters, Texture, Vector2 } from "three";
-import { billboardChunk } from "./common";
+import { billboardChunk, BillboardUnit } from "./common";
 
 import { pipe } from "fp-ts/lib/function";
 
@@ -125,7 +126,7 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
       const color = Texture2D(uMap, flipbookUVs);
 
       return ShaderMaster({
-        position: position,
+        position: BillboardUnit(Vec2(position), ViewMatrix),
         color: color.color,
         alpha: color.alpha,
       });

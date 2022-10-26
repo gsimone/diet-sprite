@@ -1,9 +1,5 @@
-import { shaderMaterial } from "@react-three/drei";
 import { forwardRef } from "react";
 import {
-  $,
-  Add,
-  Div,
   Float,
   Floor,
   GlobalTime,
@@ -12,63 +8,31 @@ import {
   Mul,
   Sub,
   Texture2D,
-  Unit,
   varying,
   Vec2,
   Vec3,
   VertexID,
   ViewMatrix,
 } from "shader-composer";
+
 import {
   Shader,
   ShaderMaster,
   useShader,
   useUniformUnit,
 } from "shader-composer-r3f";
-import { DataTexture, Material, MeshBasicMaterial, MeshBasicMaterialParameters, Texture, Vector2 } from "three";
-import { billboardChunk, BillboardUnit } from "./common";
+
+import {
+  DataTexture,
+  MeshBasicMaterial,
+  MeshBasicMaterialParameters,
+  Texture,
+  Vector2,
+} from "three";
+
+import { BillboardUnit, FlipbookUV, PositionFromDataTexture } from "./common";
 
 import { pipe } from "fp-ts/lib/function";
-
-const getFlipbookUV = (
-  uv: Unit<"vec2">,
-  size: Unit<"vec2">,
-  index: Unit<"float">
-): Unit<"vec2"> => {
-  const horizontalIndex = Modulo(index, size.x);
-  const verticalIndex = Floor(Div(index, size.x));
-
-  const u = Float(
-    $` (${uv.x} + .5) / ${size.x} + (1. / ${size.x} ) * ${horizontalIndex} `
-  );
-  const v = Float(
-    $`((${uv.y} + .5) / ${size.y}) + 1. - (1. / ${size.y} ) * (${verticalIndex} + 1.)`
-  );
-
-  const flipbookUVs = Vec2([u, v]);
-
-  return flipbookUVs;
-};
-
-const getPositionFromDataTexture = (
-  texture: Unit<"sampler2D">,
-  vertexID: Unit<"int">,
-  numberOfVertices: Unit<"float">,
-  size: Unit<"vec2">,
-  index: Unit<"float">
-): Unit<"vec3"> => {
-  // total number of sprites in the flipbook
-  const total = Mul(size.x, size.y);
-
-  const uv = Vec2([
-    Div(Float(vertexID), numberOfVertices),
-    Mul(Div(1, total), index),
-  ]);
-
-  const pos = Vec3(Texture2D(texture, uv));
-
-  return pos;
-};
 
 interface MaterialProps extends MeshBasicMaterialParameters {
   dataTexture: DataTexture;
@@ -77,9 +41,9 @@ interface MaterialProps extends MeshBasicMaterialParameters {
   flipbookMap: Texture;
   fps?: number;
   debug?: boolean;
-};
+}
 
-export const MyMaterial = forwardRef<Material, MaterialProps>(
+export const MyMaterial = forwardRef<MeshBasicMaterial, MaterialProps>(
   (
     {
       dataTexture,
@@ -99,6 +63,8 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
     const uNumberOfVertices = useUniformUnit("float", vertices);
     const uMap = useUniformUnit("sampler2D", flipbookMap);
 
+    const total = Mul(uSize.x, uSize.y);
+
     /**
      * Scrolls the index of the flipbook based on global time and fps
      */
@@ -106,16 +72,16 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
       GlobalTime,
       (t) => Mul(t, fps),
       (v) => Floor(v),
-      (v) => Modulo(v, Mul(uSize.x, uSize.y))
+      (v) => Modulo(v, total)
     );
 
     /**
      * Just to do a little variation in the instanced example, offset the index by the instanceID
      */
-    index = Sub(index, Modulo( Float(InstanceID), Mul(uSize.x, uSize.y) ));
+    index = Sub(index, Modulo(Float(InstanceID), total));
 
     const shader = useShader(() => {
-      const position = getPositionFromDataTexture(
+      const position = PositionFromDataTexture(
         uDataTexture,
         VertexID,
         uNumberOfVertices,
@@ -123,14 +89,14 @@ export const MyMaterial = forwardRef<Material, MaterialProps>(
         index
       );
 
-      const flipbookUVs = varying(getFlipbookUV(Vec2(position), uSize, index));
+      const flipbookUVs = varying(FlipbookUV(Vec2(position), uSize, index));
 
-      const color = Texture2D(uMap, flipbookUVs);
+      const sample = Texture2D(uMap, flipbookUVs);
 
       return ShaderMaster({
         position: BillboardUnit(Vec2(position), ViewMatrix),
-        color: debug ? Vec3([flipbookUVs, 0.]) : color.color,
-        alpha: color.alpha,
+        color: debug ? Vec3([flipbookUVs, 0]) : sample.color,
+        alpha: sample.alpha,
       });
     });
 

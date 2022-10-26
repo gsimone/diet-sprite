@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { $, Vec2, VertexPosition, ViewMatrix } from "shader-composer";
+import { Vec2, VertexPosition, ViewMatrix } from "shader-composer";
 import { Shader, ShaderMaster, useShader } from "shader-composer-r3f";
 import { MeshBasicMaterial } from "three";
 import { BillboardUnit } from "./common";

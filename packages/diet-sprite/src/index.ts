@@ -3,6 +3,8 @@ export type Point = {
   y: number;
 };
 
-export * from "./ClippedSpriteGeometry";
+export * from "./DietSpriteGeometry";
 export * from "./ClippedFlipbookGeometry";
 export * from "./createClippedFlipbook";
+export * from "./PolygonGenerator";
+export * from "./filters";

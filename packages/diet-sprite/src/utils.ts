@@ -1,5 +1,5 @@
 import { Point } from ".";
-import * as buffer from "maath/buffer";
+import { mapBuffer } from "./maath-helpers";
 
 export function fillBuffer(count: number, point: number[]): Float32Array {
   const buffer = new Float32Array(count);
@@ -58,7 +58,7 @@ export function getUVsFromPositions(
   horizontalIndex: number,
   verticalIndex: number
 ) {
-  const uv = buffer.map(positions.slice(0), 2, (v) => {
+  const uv = mapBuffer(positions.slice(0), 2, (v) => {
     let x = v[0] + 0.5;
     x = x / horizontalSlices + (1 / horizontalSlices) * horizontalIndex;
 

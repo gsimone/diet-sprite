@@ -6,6 +6,7 @@ type Settings = {
   threshold: number;
   slices: [number, number];
   indices: [number, number];
+  accumulateSprites?: boolean;
 };
 
 const DEFAULT_SETTINGS: Settings = {
@@ -14,7 +15,7 @@ const DEFAULT_SETTINGS: Settings = {
   indices: [1, 1],
 };
 
-export class ClippedSpriteGeometry extends BufferGeometry {
+export class DietSpriteGeometry extends BufferGeometry {
   image: HTMLImageElement;
   vertices: number = 8;
   settings = DEFAULT_SETTINGS;
@@ -24,7 +25,8 @@ export class ClippedSpriteGeometry extends BufferGeometry {
     vertices = 8,
     threshold = 0.01 as Settings["threshold"],
     slices = [1, 1] as Settings["slices"],
-    indices = [0, 0] as Settings["indices"]
+    indices = [0, 0] as Settings["indices"],
+    accumulateSprites = true as Settings["accumulateSprites"]
   ) {
     super();
 
@@ -34,6 +36,7 @@ export class ClippedSpriteGeometry extends BufferGeometry {
       threshold,
       slices,
       indices,
+      accumulateSprites,
     };
 
     this.image =

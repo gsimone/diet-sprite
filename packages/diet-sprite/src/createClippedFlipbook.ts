@@ -7,7 +7,7 @@ import {
 } from "three";
 import { addAxis } from "./utils";
 
-import { ClippedSpriteGeometry } from "./ClippedSpriteGeometry";
+import { DietSpriteGeometry } from "./DietSpriteGeometry";
 
 type FlipbookData = [
   /**
@@ -21,6 +21,7 @@ type FlipbookData = [
 
 /**
  * Generates geometry data for a given flipbook image.
+ * @deprecated This function will be removed in a future version. Use DietSpriteGeometry instead.
  */
 export function createClippedFlipbook(
   imageOrTexture: HTMLImageElement | Texture,
@@ -44,12 +45,13 @@ export function createClippedFlipbook(
    * @note We could also have a uvs buffer but uvs are very easily calculated in the shader with some multiplications.
    */
   for (let i = 0; i < total; i++) {
-    const geometry = new ClippedSpriteGeometry(
+    const geometry = new DietSpriteGeometry(
       imageOrTexture,
       vertices,
       threshold,
       slices,
-      [i % slices[0], Math.floor(i / slices[0])]
+      [i % slices[0], Math.floor(i / slices[0])],
+      true // accumulateSprites - always true
     );
 
     const pos = geometry.attributes.position.array;

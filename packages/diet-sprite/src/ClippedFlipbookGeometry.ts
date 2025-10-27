@@ -3,6 +3,7 @@ import { fillBuffer } from "./utils";
 
 /**
  * Just a bare minimum geometry used to render the flipbook.
+ * @deprecated This class will be removed in a future version. Use DietSpriteGeometry instead.
  */
 export class ClippedFlipbookGeometry extends BufferGeometry {
   constructor(vertices: number) {

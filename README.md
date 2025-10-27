@@ -19,7 +19,7 @@ The geometry can be easily generated at runtime from an image:
 
 ```jsx
 // vanilla example
-const geometry = new ClippedSpriteGeometry(
+const geometry = new DietSpriteGeometry(
   image, // an already loaded HTMLImageElement or a ThreeJS texture
   8, // the number of desired vertices. 4/6/8 seem to give good results most of the time.
   0 // alphaThreshold, 0 means only fully transparent pixels will be discarded
@@ -31,7 +31,7 @@ const geometry = new ClippedSpriteGeometry(
 const myTexture = useTexture('myImage.png') // a r3f texture
 
 <instancedMesh>
-  <clippedSpriteGeometry args={[
+  <dietSpriteGeometry args={[
     myTexture,
     8,
     0

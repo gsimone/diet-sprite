@@ -1,25 +1,19 @@
 {
-  "name": "diet-sprite",
+  "name": "diet-sprite-monorepo",
   "private": true,
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
   "workspaces": [
     "packages/*",
-    "demo"
+    "app"
   ],
-  "preconstruct": {
-    "packages": [
-      "packages/*"
-    ]
-  },
   "scripts": {
-    "ci": "preconstruct validate && manypkg check && pnpm build",
+    "ci": "manypkg check && pnpm build",
     "release": "pnpm ci && changeset publish --access public",
-    "postinstall": "preconstruct dev",
-    "build": "preconstruct build",
-    "dev": "preconstruct dev",
-    "demo": "cd demo && pnpm dev",
+    "build": "pnpm -r --filter './packages/*' build && cd app && pnpm build && cd ..",
+    "dev": "pnpm --filter diet-sprite dev & pnpm --filter demo dev",
+    "demo": "cd app && pnpm dev",
     "test": "jest",
     "prepare": "husky install"
   },
@@ -30,7 +24,6 @@
     "@babel/preset-typescript": "^7.16.7",
     "@changesets/cli": "^2.22.0",
     "@manypkg/cli": "^0.19.1",
-    "@preconstruct/cli": "^2.1.5",
     "@types/jest": "^27.4.1",
     "@types/three": "^0.139.0",
     "babel-jest": "^27.5.1",
@@ -39,7 +32,8 @@
     "leva": "^0.9.23",
     "lint-staged": ">=10",
     "prettier": "^2.6.2",
-    "typescript": "^4.6.3"
+    "tsdown": "^0.2.0",
+    "typescript": "^5.5.2"
   },
   "lint-staged": {
     "packages/**/src/*.{ts,tsx,css,md}": "prettier --write"

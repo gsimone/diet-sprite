@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "packageManager": "pnpm@10.12.4",
   "workspaces": [
     "packages/*",
     "app"
@@ -11,7 +12,7 @@
   "scripts": {
     "ci": "manypkg check && pnpm build",
     "release": "pnpm ci && changeset publish --access public",
-    "build": "pnpm -r --filter './packages/*' build && cd app && pnpm build && cd ..",
+    "build": "turbo build",
     "dev": "pnpm --filter diet-sprite dev & pnpm --filter demo dev",
     "demo": "cd app && pnpm dev",
     "test": "jest",
@@ -37,5 +38,8 @@
   },
   "lint-staged": {
     "packages/**/src/*.{ts,tsx,css,md}": "prettier --write"
+  },
+  "devDependencies": {
+    "turbo": "latest"
   }
 }

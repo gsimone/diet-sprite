@@ -8,24 +8,16 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      },
-      "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.cjs"
-      }
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
     },
     "./filters": {
-      "import": {
-        "types": "./dist/filters.d.ts",
-        "default": "./dist/filters.js"
-      },
-      "require": {
-        "types": "./dist/filters.d.ts",
-        "default": "./dist/filters.cjs"
-      }
+      "types": "./dist/filters.d.ts",
+      "import": "./dist/filters.js",
+      "require": "./dist/filters.cjs",
+      "default": "./dist/filters.js"
     }
   },
   "files": [

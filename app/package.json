@@ -15,6 +15,7 @@
     "@types/js-beautify": "^1.14.3",
     "@types/stats.js": "^0.17.4",
     "@types/three": "^0.139.0",
+    "@use-gesture/react": "^10.3.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "diet-sprite": "workspace:*",

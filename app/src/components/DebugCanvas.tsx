@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { PolygonGenerator } from "diet-sprite";
 import NumberFlow from "@number-flow/react";
 import { cx } from "class-variance-authority";
@@ -44,20 +44,81 @@ export function DebugCanvas({
     null
   );
   const [areaReduction, setAreaReduction] = useState(0);
+  const [containerSize, setContainerSize] = useState(size);
+  const containerRef = useRef<HTMLDivElement>(null);
   const generationTimeRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
+
+  // Memoize slices calculation - only recalculates when gridSize changes
+  const slices = useMemo<[number, number]>(() => {
+    const gridDimension = Math.sqrt(gridSize);
+    return [gridDimension, gridDimension];
+  }, [gridSize]);
+
+  // Measure container size
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const { width, height } = entry.contentRect;
+        const minSize = Math.min(width, height);
+        if (minSize > 0) {
+          setContainerSize(minSize);
+        }
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
+  // Clear canvas immediately when it's set to prevent showing old content
+  useEffect(() => {
+    if (!debugCanvas) return;
+    
+    // Set dimensions to 0 initially to ensure it's cleared
+    debugCanvas.width = 0;
+    debugCanvas.height = 0;
+  }, [debugCanvas]);
 
   useEffect(() => {
     if (!debugCanvas) return;
 
-    const image = new Image();
-    image.src = imageSrc;
-    image.onload = async () => {
-      const t0 = performance.now();
+    // If image is already loaded and imageSrc hasn't changed, reuse it
+    const cachedImage = imageRef.current;
+    const shouldReuseImage = cachedImage && cachedImage.src === imageSrc && cachedImage.complete;
+    
+    const image = shouldReuseImage ? cachedImage : new Image();
+    
+    if (!shouldReuseImage) {
+      image.src = imageSrc;
+    }
+    
+    const generatePolygon = async () => {
+      // Set canvas dimensions immediately to clear old content
+      // Setting width/height automatically clears the canvas
+      const baseSize = containerSize / 2;
+      const scale = 4;
+      const dpr = window.devicePixelRatio || 1;
+      const padding = 0.2;
+      const contentWidth = baseSize * scale * dpr;
+      const contentHeight = baseSize * scale * dpr;
+      const paddingX = contentWidth * padding;
+      const paddingY = contentHeight * padding;
+      const width = contentWidth + paddingX * 2;
+      const height = contentHeight + paddingY * 2;
+      debugCanvas.width = width;
+      debugCanvas.height = height;
 
-      // Convert gridSize to slices array
-      const gridDimension = Math.sqrt(gridSize);
-      const slices: [number, number] = [gridDimension, gridDimension];
+      const ctx = debugCanvas.getContext("2d");
+      if (!ctx) return;
+
+      const t0 = performance.now();
 
       const polygon = new PolygonGenerator(
         image,
@@ -81,24 +142,6 @@ export function DebugCanvas({
       if (onPolygonGenerated) {
         onPolygonGenerated(polygon);
       }
-
-      // draw the imageData to the canvas
-      const ctx = debugCanvas.getContext("2d");
-      if (!ctx) return;
-
-      // Set canvas buffer size to 4x the imageData dimensions with 20% padding
-      const baseSize = size / 2; // size is display size (e.g. 256px), base is half
-      const scale = 4;
-      const dpr = window.devicePixelRatio || 1;
-      const padding = 0.2;
-      const contentWidth = baseSize * scale * dpr;
-      const contentHeight = baseSize * scale * dpr;
-      const paddingX = contentWidth * padding;
-      const paddingY = contentHeight * padding;
-      const width = contentWidth + paddingX * 2;
-      const height = contentHeight + paddingY * 2;
-      debugCanvas.width = width;
-      debugCanvas.height = height;
 
       // Helper function to draw polygon
       const drawPolygon = () => {
@@ -252,32 +295,47 @@ export function DebugCanvas({
       }
     };
 
+    // Handle image load - if already cached/complete, generate immediately
+    if (shouldReuseImage || image.complete) {
+      imageRef.current = image;
+      generatePolygon();
+    } else {
+      image.onload = () => {
+        imageRef.current = image;
+        generatePolygon();
+      };
+    }
+
     return () => {
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
+      // Only clear imageRef if imageSrc is changing (not just other params)
+      if (!shouldReuseImage) {
+        imageRef.current = null;
+      }
     };
   }, [
     debugCanvas,
+    imageSrc,
     numberOfVertices,
     threshold,
-    gridSize,
+    slices,
     indices,
     accumulateSprites,
-    imageSrc,
     animate,
-    size,
+    containerSize,
     fps,
     alphaColor,
   ]);
 
   return (
     <div
-      className={`relative shrink-0 ${
+      ref={containerRef}
+      className={`relative w-full aspect-square ${
         onClick ? "cursor-pointer transition-transform" : ""
       }`}
-      style={{ width: `${size}px`, height: `${size}px` }}
       onClick={(e) => {
         e.stopPropagation();
         onClick?.();

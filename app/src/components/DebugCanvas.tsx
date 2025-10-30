@@ -50,6 +50,8 @@ export function DebugCanvas({
   const generationTimeRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
+  const currentFrameRef = useRef<number>(0);
+  const previousGridSizeRef = useRef<number>(gridSize);
 
   // Memoize slices calculation - only recalculates when gridSize changes
   const slices = useMemo<[number, number]>(() => {
@@ -276,7 +278,17 @@ export function DebugCanvas({
         const [cols, rows] = slices;
         const totalFrames = cols * rows;
 
-        let currentFrame = 0;
+        // Reset frame only if gridSize changed
+        if (previousGridSizeRef.current !== gridSize) {
+          currentFrameRef.current = 0;
+          previousGridSizeRef.current = gridSize;
+        }
+
+        // Ensure current frame is within valid range for the current grid size
+        if (currentFrameRef.current >= totalFrames) {
+          currentFrameRef.current = 0;
+        }
+
         const frameDuration = 1000 / fps;
         let lastFrameTime = 0;
 
@@ -286,8 +298,8 @@ export function DebugCanvas({
             ctx.clearRect(0, 0, width, height);
 
             // Calculate current frame position in atlas
-            const col = currentFrame % cols;
-            const row = Math.floor(currentFrame / cols);
+            const col = currentFrameRef.current % cols;
+            const row = Math.floor(currentFrameRef.current / cols);
             const sx = col * spriteWidth;
             const sy = row * spriteHeight;
 
@@ -309,7 +321,7 @@ export function DebugCanvas({
             drawPolygon();
 
             // Update frame
-            currentFrame = (currentFrame + 1) % totalFrames;
+            currentFrameRef.current = (currentFrameRef.current + 1) % totalFrames;
             lastFrameTime = timestamp;
           }
 

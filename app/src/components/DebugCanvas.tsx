@@ -51,7 +51,7 @@ export function DebugCanvas({
   const animationFrameRef = useRef<number | null>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const currentFrameRef = useRef<number>(0);
-  const previousGridSizeRef = useRef<number>(gridSize);
+  const previousGridSizeRef = useRef<number>(-1);
 
   // Memoize slices calculation - only recalculates when gridSize changes
   const slices = useMemo<[number, number]>(() => {
@@ -282,10 +282,9 @@ export function DebugCanvas({
         if (previousGridSizeRef.current !== gridSize) {
           currentFrameRef.current = 0;
           previousGridSizeRef.current = gridSize;
-        }
-
-        // Ensure current frame is within valid range for the current grid size
-        if (currentFrameRef.current >= totalFrames) {
+        } else if (currentFrameRef.current >= totalFrames) {
+          // Ensure current frame is within valid range for the current grid size
+          // Only check this if gridSize didn't change (otherwise we already reset to 0)
           currentFrameRef.current = 0;
         }
 

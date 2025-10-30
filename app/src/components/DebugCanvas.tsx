@@ -4,6 +4,7 @@ import NumberFlow from "@number-flow/react";
 import { cx } from "class-variance-authority";
 
 import defaultDepthImage from "../../assets/depth_1.png";
+import { DEFAULT_FPS } from "../constants";
 
 // Constants to prevent creating new array references on every render
 const DEFAULT_GRID_SIZE = 256;
@@ -34,7 +35,7 @@ export function DebugCanvas({
   imageSrc = defaultDepthImage,
   animate = false,
   size = 256,
-  fps = 30,
+  fps = DEFAULT_FPS,
   onPolygonGenerated,
   showBackgroundNumber = false,
   alphaColor,
@@ -143,11 +144,33 @@ export function DebugCanvas({
         onPolygonGenerated(polygon);
       }
 
+      // Calculate actual sprite dimensions to get correct aspect ratio
+      const [cols, rows] = slices;
+      const spriteWidth = image.width / cols;
+      const spriteHeight = image.height / rows;
+      const spriteAspect = spriteWidth / spriteHeight;
+
       // Helper function to draw polygon
       const drawPolygon = () => {
-        // Positions are normalized [-0.5, 0.5], need to transform to canvas space with padding offset
-        const toCanvasX = (x: number) => (x + 0.5) * contentWidth + paddingX;
-        const toCanvasY = (y: number) => (0.5 - y) * contentHeight + paddingY; // flip Y
+        // Adjust content dimensions to maintain correct aspect ratio of the sprite
+        let actualContentWidth = contentWidth;
+        let actualContentHeight = contentHeight;
+        let offsetX = paddingX;
+        let offsetY = paddingY;
+
+        if (spriteAspect > 1) {
+          // Wider than tall
+          actualContentHeight = contentWidth / spriteAspect;
+          offsetY = paddingY + (contentHeight - actualContentHeight) / 2;
+        } else {
+          // Taller than wide
+          actualContentWidth = contentHeight * spriteAspect;
+          offsetX = paddingX + (contentWidth - actualContentWidth) / 2;
+        }
+
+        // Positions are normalized [-0.5, 0.5], need to transform to canvas space with offset
+        const toCanvasX = (x: number) => (x + 0.5) * actualContentWidth + offsetX;
+        const toCanvasY = (y: number) => (0.5 - y) * actualContentHeight + offsetY; // flip Y
 
         // Draw white rectangle representing the original sprite quad
         ctx.strokeStyle = "rgba(255, 255, 255, 0.12)";
@@ -156,8 +179,8 @@ export function DebugCanvas({
         ctx.strokeRect(
           toCanvasX(-0.5),
           toCanvasY(0.5),
-          contentWidth,
-          contentHeight
+          actualContentWidth,
+          actualContentHeight
         );
 
         // Build edge map to identify inner vs outer edges
@@ -232,12 +255,26 @@ export function DebugCanvas({
         2
       )}ms`;
 
+      // Calculate adjusted dimensions for aspect ratio (same as in drawPolygon)
+      let actualContentWidth = contentWidth;
+      let actualContentHeight = contentHeight;
+      let offsetX = paddingX;
+      let offsetY = paddingY;
+
+      if (spriteAspect > 1) {
+        // Wider than tall
+        actualContentHeight = contentWidth / spriteAspect;
+        offsetY = paddingY + (contentHeight - actualContentHeight) / 2;
+      } else {
+        // Taller than wide
+        actualContentWidth = contentHeight * spriteAspect;
+        offsetX = paddingX + (contentWidth - actualContentWidth) / 2;
+      }
+
       if (animate) {
         // Animation mode: cycle through atlas frames
         const [cols, rows] = slices;
         const totalFrames = cols * rows;
-        const spriteWidth = image.width / cols;
-        const spriteHeight = image.height / rows;
 
         let currentFrame = 0;
         const frameDuration = 1000 / fps;
@@ -254,7 +291,7 @@ export function DebugCanvas({
             const sx = col * spriteWidth;
             const sy = row * spriteHeight;
 
-            // Draw current sprite frame
+            // Draw current sprite frame with correct aspect ratio
             ctx.imageSmoothingEnabled = false;
             ctx.drawImage(
               image,
@@ -262,10 +299,10 @@ export function DebugCanvas({
               sy,
               spriteWidth,
               spriteHeight,
-              paddingX,
-              paddingY,
-              contentWidth,
-              contentHeight
+              offsetX,
+              offsetY,
+              actualContentWidth,
+              actualContentHeight
             );
 
             // Draw polygon on top
@@ -281,14 +318,14 @@ export function DebugCanvas({
 
         animationFrameRef.current = requestAnimationFrame(animationLoop);
       } else {
-        // Static mode: draw once
+        // Static mode: draw once with correct aspect ratio
         ctx.imageSmoothingEnabled = false;
         ctx.drawImage(
           await createImageBitmap(polygon.imageData),
-          paddingX,
-          paddingY,
-          contentWidth,
-          contentHeight
+          offsetX,
+          offsetY,
+          actualContentWidth,
+          actualContentHeight
         );
 
         drawPolygon();

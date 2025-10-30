@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DietSpriteGeometry } from 'diet-sprite';
 import { RenderLoop } from './RenderLoop';
 import Stats from 'stats.js';
+import { DEFAULT_FPS } from '../constants';
 
 const MAX_OVERDRAW = 30;
 
@@ -287,7 +288,7 @@ export class Scene3D {
     this.options = {
       ...options,
       animate: options.animate ?? false,
-      fps: options.fps ?? 30,
+      fps: options.fps ?? DEFAULT_FPS,
       useInstancing: options.useInstancing ?? false,
       instanceGridSize: options.instanceGridSize ?? 128,
     };

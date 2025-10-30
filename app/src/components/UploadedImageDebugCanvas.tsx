@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { guessAtlasGrid } from "../utils";
 import { DebugCanvas } from "./DebugCanvas";
 import { NumberSlider } from "./NumberSlider";
+import { DEFAULT_FPS } from "../constants";
 
 const VERTICES_OPTIONS = [3, 4, 5, 6, 7, 8, 9, 10];
 
@@ -35,7 +36,7 @@ export function UploadedImageDebugCanvasWithControls({
   const [numberOfVertices, setNumberOfVertices] = useState(5);
   const [gridSize, setGridSize] = useState(64);
   const [animate] = useState(true);
-  const [fps] = useState(60);
+  const [fps] = useState(DEFAULT_FPS);
   const [threshold, setThreshold] = useState(0);
   const [useAlphaColor] = useState(false);
   const [alphaColorPicker] = useState("#ff00ff");

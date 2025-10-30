@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Scene3D, Scene3DOptions } from "./Scene3DVanilla";
+import { DEFAULT_FPS } from "../constants";
 
 interface Scene3DWrapperProps extends Omit<Scene3DOptions, "container"> {
   className?: string;
@@ -58,7 +59,7 @@ export function Scene3DWrapper(props: Scene3DWrapperProps) {
       });
       sceneRef.current.updateAnimationParams(
         props.animate ?? false,
-        props.fps ?? 30
+        props.fps ?? DEFAULT_FPS
       );
     }
   }, [props.animate, props.fps]);
